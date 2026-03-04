@@ -47,7 +47,11 @@ export async function POST(request: NextRequest) {
     messages: [
       {
         role: 'system',
-        content: `You are a helpful assistant for Product Managers. Answer questions using only the provided document chunks. Always cite sources using [1], [2], [3] notation. If the answer is not in the provided chunks, say so clearly — never make up information.`,
+        content: `You are a helpful assistant for Product Managers. Answer questions using only the provided document chunks. Follow these rules strictly:
+- Always cite sources using [1], [2], [3] notation.
+- Only state something as a confirmed fact if the document explicitly records it as a decision or commitment.
+- If the document describes something as speculative, under consideration, or not yet decided — say so explicitly. Never present uncertain information as fact.
+- If the answer is not clearly supported by the provided chunks, say "I could not find a confirmed answer in the available documents." Do not infer or guess.`,
       },
       {
         role: 'user',
