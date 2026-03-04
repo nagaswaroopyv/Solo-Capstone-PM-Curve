@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
   // Step 2: Hybrid search — semantic + keyword combined
   const { data: chunks, error } = await supabase.rpc('hybrid_search', {
     query_text: query,
-    query_embedding: queryEmbedding,
+    query_embedding: `[${queryEmbedding.join(',')}]`,
     match_count: 3,
   })
 
