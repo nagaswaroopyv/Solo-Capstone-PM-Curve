@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const supabase = createClient(
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   const { query } = await request.json()
 
   if (!query) {
-    return NextResponse.json({ error: 'Query is required' }, { status: 400 })
+    return new Response(JSON.stringify({ error: 'Query is required' }), { status: 400 })
   }
 
   const t0 = Date.now()
@@ -34,28 +34,31 @@ export async function POST(request: NextRequest) {
   const t2 = Date.now()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 
-  // Step 2b: Relevance threshold — if no chunk scores above 0.80, don't call LLM
+  // Step 2b: Relevance threshold
   const RELEVANCE_THRESHOLD = 0.50
   const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
 
   if (relevantChunks.length === 0) {
-    return NextResponse.json({
+    const payload = JSON.stringify({
+      type: 'done',
       answer: 'I could not find any documents with sufficient relevance to answer this question. Try rephrasing or check if the topic exists in your connected documents.',
       sources: [],
       latency: { embedding_ms: t1 - t0, search_ms: t2 - t1, llm_ms: 0, total_ms: Date.now() - t0 },
     })
+    return new Response(payload, { headers: { 'Content-Type': 'application/json' } })
   }
 
-  // Step 3: Pass top chunks + query to GPT-4o mini
+  // Step 3: Stream LLM response
   const context = relevantChunks
     .map((c: any, i: number) => `[${i + 1}] Source: ${c.source_file}\n${c.content}`)
     .join('\n\n')
 
-  const completion = await openai.chat.completions.create({
+  const stream = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
+    stream: true,
     messages: [
       {
         role: 'system',
@@ -71,25 +74,46 @@ export async function POST(request: NextRequest) {
       },
     ],
   })
-  const t3 = Date.now()
 
-  const latency = {
-    embedding_ms: t1 - t0,
-    search_ms: t2 - t1,
-    llm_ms: t3 - t2,
-    total_ms: t3 - t0,
-  }
+  const encoder = new TextEncoder()
 
-  console.log(`[search] query="${query}" | embedding=${latency.embedding_ms}ms | search=${latency.search_ms}ms | llm=${latency.llm_ms}ms | total=${latency.total_ms}ms`)
+  const readable = new ReadableStream({
+    async start(controller) {
+      // First send sources immediately so UI can render them while answer streams
+      const sourcesPayload = JSON.stringify({
+        type: 'sources',
+        sources: relevantChunks.map((c: any) => ({
+          source_file: c.source_file,
+          content: c.content,
+          score: c.combined_score,
+        })),
+        latency_so_far: { embedding_ms: t1 - t0, search_ms: t2 - t1 },
+      })
+      controller.enqueue(encoder.encode(sourcesPayload + '\n'))
 
-  // Step 4: Return answer + sources + latency
-  return NextResponse.json({
-    answer: completion.choices[0].message.content,
-    sources: relevantChunks.map((c: any) => ({
-      source_file: c.source_file,
-      content: c.content,
-      score: c.combined_score,
-    })),
-    latency,
+      // Then stream answer tokens
+      for await (const chunk of stream) {
+        const token = chunk.choices[0]?.delta?.content
+        if (token) {
+          controller.enqueue(encoder.encode(JSON.stringify({ type: 'token', token }) + '\n'))
+        }
+      }
+
+      // Finally send latency
+      const t3 = Date.now()
+      const donePayload = JSON.stringify({
+        type: 'done',
+        latency: { embedding_ms: t1 - t0, search_ms: t2 - t1, llm_ms: t3 - t2, total_ms: t3 - t0 },
+      })
+      controller.enqueue(encoder.encode(donePayload + '\n'))
+      controller.close()
+    },
+  })
+
+  return new Response(readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+    },
   })
 }

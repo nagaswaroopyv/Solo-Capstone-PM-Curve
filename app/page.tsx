@@ -15,16 +15,13 @@ interface Latency {
   total_ms: number
 }
 
-interface SearchResult {
-  answer: string
-  sources: Source[]
-  latency: Latency
-}
-
 export default function Home() {
   const [query, setQuery] = useState('')
-  const [result, setResult] = useState<SearchResult | null>(null)
+  const [answer, setAnswer] = useState('')
+  const [sources, setSources] = useState<Source[]>([])
+  const [latency, setLatency] = useState<Latency | null>(null)
   const [loading, setLoading] = useState(false)
+  const [streaming, setStreaming] = useState(false)
   const [error, setError] = useState('')
   const [recentSearches, setRecentSearches] = useState<string[]>([])
 
@@ -32,8 +29,11 @@ export default function Home() {
     if (!searchQuery.trim()) return
 
     setLoading(true)
+    setStreaming(false)
     setError('')
-    setResult(null)
+    setAnswer('')
+    setSources([])
+    setLatency(null)
 
     try {
       const response = await fetch('/api/search', {
@@ -42,11 +42,52 @@ export default function Home() {
         body: JSON.stringify({ query: searchQuery }),
       })
 
-      const data = await response.json()
+      if (!response.ok) throw new Error('Search failed')
 
-      if (!response.ok) throw new Error(data.error)
+      const contentType = response.headers.get('Content-Type') || ''
 
-      setResult(data)
+      // Non-streaming response (no results case)
+      if (!contentType.includes('text/event-stream')) {
+        const data = await response.json()
+        setAnswer(data.answer)
+        setSources(data.sources || [])
+        setLatency(data.latency || null)
+        setRecentSearches(prev =>
+          [searchQuery, ...prev.filter(s => s !== searchQuery)].slice(0, 5)
+        )
+        return
+      }
+
+      // Streaming response
+      setStreaming(true)
+      const reader = response.body!.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (!line.trim()) continue
+          try {
+            const msg = JSON.parse(line)
+            if (msg.type === 'sources') {
+              setSources(msg.sources)
+            } else if (msg.type === 'token') {
+              setAnswer(prev => prev + msg.token)
+            } else if (msg.type === 'done') {
+              if (msg.answer) setAnswer(msg.answer)
+              if (msg.latency) setLatency(msg.latency)
+            }
+          } catch {}
+        }
+      }
+
       setRecentSearches(prev =>
         [searchQuery, ...prev.filter(s => s !== searchQuery)].slice(0, 5)
       )
@@ -54,8 +95,11 @@ export default function Home() {
       setError(err.message || 'Something went wrong')
     } finally {
       setLoading(false)
+      setStreaming(false)
     }
   }
+
+  const hasResult = answer.length > 0
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -86,7 +130,7 @@ export default function Home() {
         </div>
 
         {/* Recent searches */}
-        {recentSearches.length > 0 && !result && !loading && (
+        {recentSearches.length > 0 && !hasResult && !loading && (
           <div className="mt-4">
             <p className="text-xs text-gray-400 mb-2">Recent searches</p>
             <div className="flex flex-wrap gap-2">
@@ -111,49 +155,58 @@ export default function Home() {
         )}
 
         {/* Results */}
-        {result && (
+        {hasResult && (
           <div className="mt-8 space-y-6">
-            {/* Answer */}
+            {/* Answer — streams in word by word */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <p className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-3">Answer</p>
-              <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+              <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+                {answer}
+                {streaming && <span className="animate-pulse">▌</span>}
+              </p>
             </div>
 
-            {/* Sources */}
-            <div>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Sources</p>
-              <div className="space-y-3">
-                {result.sources.map((source, i) => (
-                  <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-gray-700">
-                        [{i + 1}] {source.source_file.replace(/\\/g, '/')}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        Relevance: {(source.score * 100).toFixed(0)}%
-                      </span>
+            {/* Sources — appear as soon as retrieval completes */}
+            {sources.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Sources</p>
+                <div className="space-y-3">
+                  {sources.map((source, i) => (
+                    <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-gray-700">
+                          [{i + 1}] {source.source_file.replace(/\\/g, '/')}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          Relevance: {(source.score * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">{source.content}</p>
                     </div>
-                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">{source.content}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Latency breakdown */}
-            <div className="text-xs text-gray-400 flex gap-4">
-              <span>Total: {result.latency.total_ms}ms</span>
-              <span>Embedding: {result.latency.embedding_ms}ms</span>
-              <span>Search: {result.latency.search_ms}ms</span>
-              <span>LLM: {result.latency.llm_ms}ms</span>
-            </div>
+            {/* Latency — appears after stream completes */}
+            {latency && (
+              <div className="text-xs text-gray-400 flex gap-4">
+                <span>Total: {latency.total_ms}ms</span>
+                <span>Embedding: {latency.embedding_ms}ms</span>
+                <span>Search: {latency.search_ms}ms</span>
+                <span>LLM: {latency.llm_ms}ms</span>
+              </div>
+            )}
 
             {/* New search */}
-            <button
-              onClick={() => { setResult(null); setQuery('') }}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              ← New search
-            </button>
+            {!streaming && (
+              <button
+                onClick={() => { setAnswer(''); setSources([]); setLatency(null); setQuery('') }}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                ← New search
+              </button>
+            )}
           </div>
         )}
       </div>
