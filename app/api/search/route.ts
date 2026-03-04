@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Step 2b: Relevance threshold — if no chunk scores above 0.80, don't call LLM
-  const RELEVANCE_THRESHOLD = 0.80
+  const RELEVANCE_THRESHOLD = 0.50
   const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
 
   if (relevantChunks.length === 0) {
