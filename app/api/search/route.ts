@@ -15,12 +15,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Query is required' }, { status: 400 })
   }
 
+  const t0 = Date.now()
+
   // Step 1: Embed the query
   const embeddingResponse = await openai.embeddings.create({
     model: 'text-embedding-3-small',
     input: query,
   })
   const queryEmbedding = embeddingResponse.data[0].embedding
+  const t1 = Date.now()
 
   // Step 2: Hybrid search — semantic + keyword combined
   const { data: chunks, error } = await supabase.rpc('hybrid_search', {
@@ -28,6 +31,7 @@ export async function POST(request: NextRequest) {
     query_embedding: `[${queryEmbedding.join(',')}]`,
     match_count: 3,
   })
+  const t2 = Date.now()
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -51,8 +55,18 @@ export async function POST(request: NextRequest) {
       },
     ],
   })
+  const t3 = Date.now()
 
-  // Step 4: Return answer + sources
+  const latency = {
+    embedding_ms: t1 - t0,
+    search_ms: t2 - t1,
+    llm_ms: t3 - t2,
+    total_ms: t3 - t0,
+  }
+
+  console.log(`[search] query="${query}" | embedding=${latency.embedding_ms}ms | search=${latency.search_ms}ms | llm=${latency.llm_ms}ms | total=${latency.total_ms}ms`)
+
+  // Step 4: Return answer + sources + latency
   return NextResponse.json({
     answer: completion.choices[0].message.content,
     sources: chunks.map((c: any) => ({
@@ -60,5 +74,6 @@ export async function POST(request: NextRequest) {
       content: c.content,
       score: c.combined_score,
     })),
+    latency,
   })
 }

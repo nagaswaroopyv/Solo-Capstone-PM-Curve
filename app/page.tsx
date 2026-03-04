@@ -8,9 +8,17 @@ interface Source {
   score: number
 }
 
+interface Latency {
+  embedding_ms: number
+  search_ms: number
+  llm_ms: number
+  total_ms: number
+}
+
 interface SearchResult {
   answer: string
   sources: Source[]
+  latency: Latency
 }
 
 export default function Home() {
@@ -129,6 +137,14 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Latency breakdown */}
+            <div className="text-xs text-gray-400 flex gap-4">
+              <span>Total: {result.latency.total_ms}ms</span>
+              <span>Embedding: {result.latency.embedding_ms}ms</span>
+              <span>Search: {result.latency.search_ms}ms</span>
+              <span>LLM: {result.latency.llm_ms}ms</span>
             </div>
 
             {/* New search */}
