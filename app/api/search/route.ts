@@ -37,8 +37,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Step 2b: Relevance threshold — if no chunk scores above 0.80, don't call LLM
+  const RELEVANCE_THRESHOLD = 0.80
+  const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
+
+  if (relevantChunks.length === 0) {
+    return NextResponse.json({
+      answer: 'I could not find any documents with sufficient relevance to answer this question. Try rephrasing or check if the topic exists in your connected documents.',
+      sources: [],
+      latency: { embedding_ms: t1 - t0, search_ms: t2 - t1, llm_ms: 0, total_ms: Date.now() - t0 },
+    })
+  }
+
   // Step 3: Pass top chunks + query to GPT-4o mini
-  const context = chunks
+  const context = relevantChunks
     .map((c: any, i: number) => `[${i + 1}] Source: ${c.source_file}\n${c.content}`)
     .join('\n\n')
 
@@ -73,7 +85,7 @@ export async function POST(request: NextRequest) {
   // Step 4: Return answer + sources + latency
   return NextResponse.json({
     answer: completion.choices[0].message.content,
-    sources: chunks.map((c: any) => ({
+    sources: relevantChunks.map((c: any) => ({
       source_file: c.source_file,
       content: c.content,
       score: c.combined_score,
