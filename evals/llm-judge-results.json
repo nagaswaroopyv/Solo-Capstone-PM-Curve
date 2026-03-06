@@ -1,0 +1,172 @@
+{
+  "summary": {
+    "avgFaithfulness": 4.888888888888889,
+    "avgRelevance": 5,
+    "evaluated": 18,
+    "skipped": 2
+  },
+  "results": [
+    {
+      "question": "What is the new monthly price for the Starter plan effective February 1, 2026?",
+      "source_file": "Presentations\\Board_Presentation_Q1_Roadmap_Jan2026.md",
+      "answer": "The new monthly price for the Starter plan effective February 1, 2026, will be $59/month, increased from $49/month [2].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer regarding the new price for the Starter plan are directly supported by the retrieved chunks, specifically the pricing update that indicates the change from $49 to $59/month.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked about the new monthly price for the Starter plan effective February 1, 2026."
+    },
+    {
+      "question": "What is the earliest start date for the AI Lead Scoring Engine?",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q2_2026_Draft.md",
+      "answer": "I could not find a confirmed answer in the available documents regarding the earliest start date for the AI Lead Scoring Engine.",
+      "faithfulness": 5,
+      "faithfulness_reason": "The answer correctly notes that there is no confirmed start date mentioned in the retrieved chunks, which aligns with the information provided.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly addresses the question by stating the lack of information regarding the earliest start date for the AI Lead Scoring Engine."
+    },
+    {
+      "question": "What are the three primary reasons for choosing to build automation natively instead of using Zapier?",
+      "source_file": "Decision_Logs\\Decision_Build_vs_Buy_Automation.md",
+      "answer": "The three primary reasons for choosing to build automation natively instead of using Zapier are:\n\n1. **Strategic differentiation:** Native automation that deeply understands the company's proprietary data model offers a stronger competitive advantage than using a generic connector approach that competitors can easily replicate.\n\n2. **Long-term economics:** Unlike third-party automation tools like Zapier that charge per execution, native automation has zero marginal cost per execution, making it more economical at scale.\n\n3. **Customer experience:** Feedback from lost deal interviews indicates that prospects prefer automation that integrates seamlessly within the product they are already using, rather than relying on an external tool that requires additional configuration and maintenance [1][3].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks. The reasons described for building natively are accurately reflected in the decision rationale provided in the chunks.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question by listing the three primary reasons for choosing to build automation natively instead of using Zapier."
+    },
+    {
+      "question": "What was the decision made regarding the Workflow Automation Engine on November 12, 2025?",
+      "source_file": "Decision_Logs\\Decision_Build_vs_Buy_Automation.md",
+      "answer": "The decision made regarding the Workflow Automation Engine on November 12, 2025, was to build it natively rather than partnering with or white-labelling a third-party automation platform [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks which state the decision to build the Workflow Automation Engine natively on November 12, 2025.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question about the decision made regarding the Workflow Automation Engine on the specified date."
+    },
+    {
+      "question": "What issue did Priya flag regarding the lead scoring model's training data?",
+      "source_file": "Meeting_Notes\\Meeting_Sprint_Retro_Jan31_2026.md",
+      "answer": "Priya flagged a **data quality risk** regarding the lead scoring model's training data, noting that historical CRM data has gaps — specifically, leads before 2023 are missing firmographic fields. To mitigate this risk, the plan is to train the model only on data from 2023 to the present initially [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks, particularly regarding the data quality risk and the specific issue of missing firmographic fields in historical data before 2023.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked about the issue Priya flagged with the lead scoring model's training data."
+    },
+    {
+      "question": "What percentage of power users manage customer conversations across WhatsApp Business and SMS according to user research in Q3 2025?",
+      "source_file": "PRDs\\PRD_Unified_Inbox_v3.md",
+      "answer": "According to user research in Q3 2025, 67% of power users manage customer conversations across WhatsApp Business and SMS [3].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks, specifically stating that 67% of power users manage conversations across WhatsApp Business and SMS as found in chunk [3].",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked about the percentage of power users managing customer conversations across WhatsApp Business and SMS."
+    },
+    {
+      "question": "What is the estimated monthly cost for real-time Snowflake queries at scale?",
+      "source_file": "PRDs\\PRD_Custom_Dashboard_Builder.md",
+      "answer": "The estimated monthly cost for real-time Snowflake queries at scale is $8,400 [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "The answer accurately cites the cost of real-time Snowflake queries at scale as $8,400, which is directly supported by the retrieved chunks.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question regarding the estimated monthly cost for real-time Snowflake queries at scale."
+    },
+    {
+      "question": "What change was decided regarding the Slack channel selector?",
+      "source_file": "Meeting_Notes\\Meeting_Design_Review_Dashboard_Nov20_2025.md",
+      "answer": "The decision regarding the Slack channel selector is that it will show all public channels the workspace has access to, which requires a Slack scope update [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks. The decision about the Slack channel selector showing all public channels is clearly stated in the retrieved text.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly addresses the question asked regarding the change decided about the Slack channel selector, providing a complete response."
+    },
+    {
+      "question": "What step will be included in sprint planning before stories are committed?",
+      "source_file": "Meeting_Notes\\Meeting_Sprint_Retro_Jan31_2026.md",
+      "answer": "Sprint planning will include a mandatory \"dependencies check\" step before stories are committed [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks, specifically chunk [1] which states that sprint planning will include a mandatory 'dependencies check' step before stories are committed.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked, providing the specific step that will be included in sprint planning."
+    },
+    {
+      "question": "What is the reason for the price update mentioned in the document chunk?",
+      "source_file": "Decision_Logs\\Decision_Pricing_Model_Q1_2026.md",
+      "answer": "The reason for the price update mentioned in the document is that the team has added significant value since 2023 and this is the first price update in 3 years. Additionally, they note that their prices remain below market levels [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims made in the answer are directly supported by the retrieved chunks. The statement about adding significant value since 2023 and that it is the first price update in 3 years are both present in the chunks.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly addresses the question about the reason for the price update, providing a complete explanation based on the information obtained from the retrieved chunks."
+    },
+    {
+      "question": "What is the maximum frequency at which dashboards must refresh automatically?",
+      "source_file": "PRDs\\PRD_Custom_Dashboard_Builder.md",
+      "answer": "Dashboards must refresh automatically every 4 hours [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "The answer accurately reflects the information found in the retrieved chunks, specifically stating that dashboards must refresh automatically every 4 hours, which is explicitly mentioned.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly addresses the question by providing the specific frequency at which dashboards must refresh automatically."
+    },
+    {
+      "question": "What message appears when no metrics are found during a search for \"Pipeline Velocity\"?",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "answer": "When no metrics are found during a search for \"Pipeline Velocity,\" the message that appears is \"No metrics found\" along with a \"Request a metric\" link below. Clicking the link opens a form pre-filled with the search term [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks, specifically chunk [1] which details the expected result when no metrics are found during a search for 'Pipeline Velocity'. There are no unsupported claims or hallucinations.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked about the message that appears when no metrics are found during the search for 'Pipeline Velocity'."
+    },
+    {
+      "question": "What score threshold triggers automatic SDR assignment vs manual review?",
+      "source_file": "PRDs\\PRD_AI_Lead_Scoring_Engine.md",
+      "answer": "I could not find a confirmed answer in the available documents. The question about the score threshold that triggers automatic SDR assignment versus manual review is listed as an open question, indicating that it has not yet been decided [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks. The mention of the score threshold question being an open question is confirmed by the chunks.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly addresses the question asked regarding the score threshold for automatic SDR assignment vs manual review."
+    },
+    {
+      "question": "What message appears when no metrics are found after searching for \"Pipeline Velocity\"?",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "answer": "The message that appears when no metrics are found after searching for \"Pipeline Velocity\" is \"No metrics found\" along with a \"Request a metric\" link below. Clicking the link opens a form pre-filled with the search term [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks. The expected result matches exactly what the answer stated.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked regarding the message that appears when no metrics are found."
+    },
+    {
+      "question": "What are the top three contributing factors that must be shown in the score breakdown with plain-English labels?",
+      "source_file": "PRDs\\PRD_AI_Lead_Scoring_Engine.md",
+      "answer": "The top three contributing factors that must be shown in the score breakdown with plain-English labels are derived from the scoring model and encompass Behavioural Signals, Firmographic Signals, and Historical Signals. However, the specific top three contributing factors within these categories have not been explicitly detailed in the provided document. Therefore, I could not find a confirmed answer in the available documents.",
+      "faithfulness": 3,
+      "faithfulness_reason": "Most claims are supported, particularly the mention of Behavioural Signals, Firmographic Signals, and Historical Signals as contributing factors. However, the answer introduces a minor unsupported detail regarding the lack of specifics on the top three contributing factors within these categories.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly addresses the question by identifying the top contributing factors that must be shown in the score breakdown, aligning well with the requirement stated in the retrieved chunks."
+    },
+    {
+      "question": "What is the target acceptance rate for AI replies 60 days post-launch?",
+      "source_file": "PRDs\\PRD_Unified_Inbox_v3.md",
+      "answer": "The target acceptance rate for AI replies 60 days post-launch is greater than 60% [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks, specifically stating the target acceptance rate as > 60%. There are no unsupported claims or hallucinations.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked, providing the exact target acceptance rate for AI replies 60 days post-launch."
+    },
+    {
+      "question": "What is the new price for the Growth plan starting February 1, 2026?",
+      "source_file": "Decision_Logs\\Decision_Pricing_Model_Q1_2026.md",
+      "answer": "The new price for the Growth plan starting February 1, 2026, is $199/month, up from the old price of $149/month [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims made in the answer are directly supported by the retrieved chunks, which explicitly state the new price for the Growth plan as $199/month.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asked about the new price for the Growth plan starting February 1, 2026."
+    },
+    {
+      "question": "What was the primary reason identified for missing the Q3 ARR target?",
+      "source_file": "Meeting_Notes\\Meeting_Product_Strategy_Nov3_2025.md",
+      "answer": "The primary reason identified for missing the Q3 ARR target was weak reporting and dashboard capabilities, as well as product gaps in automation, which were notably raised by prospects during the sales process. Specifically, competitors had significantly more mature automation capabilities, and the sales team noted this issue in 8 of the 12 lost deals in Q3. Additionally, the average response time to customer support queries was far above expectations, which contributed to customer dissatisfaction and churn [1].",
+      "faithfulness": 5,
+      "faithfulness_reason": "All claims in the answer are directly supported by the retrieved chunks. The response accurately reflects the root causes identified in the meeting notes regarding the missed Q3 ARR target, including weak reporting capabilities, product gaps in automation, and slow customer support response time.",
+      "answer_relevance": 5,
+      "answer_relevance_reason": "The answer directly and completely addresses the question asking for the primary reason identified for missing the Q3 ARR target by summarizing the key points clearly and relevantly."
+    }
+  ]
+}

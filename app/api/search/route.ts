@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Step 2b: Relevance threshold
-  const RELEVANCE_THRESHOLD = 0.50
+  const RELEVANCE_THRESHOLD = 0.30
   const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
 
   if (relevantChunks.length === 0) {

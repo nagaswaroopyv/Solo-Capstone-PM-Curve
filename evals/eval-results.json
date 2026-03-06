@@ -1,0 +1,530 @@
+{
+  "summary": {
+    "avgPrecision": 0.34615384615384615,
+    "avgRecall": 0.46153846153846156,
+    "avgF1": 0.38141025641025633,
+    "hitRate": 0.46153846153846156
+  },
+  "results": [
+    {
+      "chunk_id": "03ef9b7f-f032-4e65-b75b-8fd187d8fcf8",
+      "source_file": "Presentations\\Board_Presentation_Q1_Roadmap_Jan2026.md",
+      "question": "What is the new monthly price for the Starter plan effective February 1, 2026?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "12b66e06-3300-49ec-978f-a758e043de7a",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q2_2026_Draft.md",
+      "question": "What is the earliest start date for the AI Lead Scoring Engine?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "1fb362b8-6cd0-4e13-9438-de631af3e576",
+      "source_file": "Decision_Logs\\Decision_Build_vs_Buy_Automation.md",
+      "question": "What are the three primary reasons for choosing to build automation natively instead of using Zapier?",
+      "retrieved_count": 3,
+      "hit": true,
+      "precision": 0.3333333333333333,
+      "recall": 1,
+      "f1": 0.5
+    },
+    {
+      "chunk_id": "23a2df4e-d86d-4afb-8904-ccbb14aea60f",
+      "source_file": "Decision_Logs\\Decision_Build_vs_Buy_Automation.md",
+      "question": "What was the decision made regarding the Workflow Automation Engine on November 12, 2025?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "284fa8c1-28e3-457a-8466-f74383675a61",
+      "source_file": "Meeting_Notes\\Meeting_Sprint_Retro_Jan31_2026.md",
+      "question": "What issue did Priya flag regarding the lead scoring model's training data?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "2ec1a7f2-da20-4921-b377-477fc7ed0b21",
+      "source_file": "PRDs\\PRD_Unified_Inbox_v3.md",
+      "question": "What percentage of power users manage customer conversations across WhatsApp Business and SMS according to user research in Q3 2025?",
+      "retrieved_count": 1,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "31a8d254-518c-4b4f-82f4-60ab12bfc164",
+      "source_file": "PRDs\\PRD_Custom_Dashboard_Builder.md",
+      "question": "What is the estimated monthly cost for real-time Snowflake queries at scale?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "31ff2aee-b97a-4621-af6a-6e338f83a22f",
+      "source_file": "Meeting_Notes\\Meeting_Design_Review_Dashboard_Nov20_2025.md",
+      "question": "What change was decided regarding the Slack channel selector?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "352c2f07-9936-42c4-be1e-1306afb6c569",
+      "source_file": "Meeting_Notes\\Meeting_Sprint_Retro_Jan31_2026.md",
+      "question": "What step will be included in sprint planning before stories are committed?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "36559b84-2f89-4ec1-afa8-f8d3523548a2",
+      "source_file": "Decision_Logs\\Decision_Pricing_Model_Q1_2026.md",
+      "question": "What is the reason for the price update mentioned in the document chunk?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "373c5d57-efd4-4da7-8c0a-ecd332158c82",
+      "source_file": "PRDs\\PRD_Custom_Dashboard_Builder.md",
+      "question": "What is the maximum frequency at which dashboards must refresh automatically?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "3bd42240-f690-495d-937e-ed0daf54bf0e",
+      "source_file": "PRDs\\PRD_AI_Lead_Scoring_Engine.md",
+      "question": "What is the estimated annual revenue loss from misqualified leads?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "3fa33919-a1d9-470e-ba23-5f17ff89b0cc",
+      "source_file": "PRDs\\PRD_Workflow_Automation_Engine.md",
+      "question": "What is the estimated time consumed by each team member per day performing repetitive manual tasks on the platform?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "48392104-4098-4151-9d5c-200891db25d0",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "question": "What message appears when no metrics are found during a search for \"Pipeline Velocity\"?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "488a3b08-21ec-40c9-830a-f62280a8509f",
+      "source_file": "PRDs\\PRD_AI_Lead_Scoring_Engine.md",
+      "question": "What score threshold triggers automatic SDR assignment vs manual review?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "4b45583a-74b8-427f-a970-85a21ff6a372",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "question": "What message appears when no metrics are found after searching for \"Pipeline Velocity\"?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "4facddf2-9cf1-4b20-bb47-ceba55296d2c",
+      "source_file": "PRDs\\PRD_AI_Lead_Scoring_Engine.md",
+      "question": "What are the top three contributing factors that must be shown in the score breakdown with plain-English labels?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "5421e12b-ecd5-40d7-9fa6-77800d8d106b",
+      "source_file": "PRDs\\PRD_Unified_Inbox_v3.md",
+      "question": "What is the target acceptance rate for AI replies 60 days post-launch?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "59a51b87-b97e-4eef-bf98-4ca4ee845e61",
+      "source_file": "Decision_Logs\\Decision_Pricing_Model_Q1_2026.md",
+      "question": "What is the new price for the Growth plan starting February 1, 2026?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "5cd82761-b1a3-47e8-a856-fea5bb315cde",
+      "source_file": "Meeting_Notes\\Meeting_Product_Strategy_Nov3_2025.md",
+      "question": "What was the primary reason identified for missing the Q3 ARR target?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "5da43a33-064a-4060-893a-1d57a818effa",
+      "source_file": "PRDs\\PRD_Workflow_Automation_Engine.md",
+      "question": "What must the email template system support for channel-level targeting?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "5eb30a50-5609-40e0-823a-846e58a8f387",
+      "source_file": "PRDs\\PRD_Workflow_Automation_Engine.md",
+      "question": "What is the maximum number of active workflows allowed in the Starter plan?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "62134f61-e589-46c3-8608-d41fcd8209ca",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "question": "What is the expected result when a user generates a link for a dashboard in view-only mode?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "62f65b17-915b-4a7b-a60d-498eb5f9b288",
+      "source_file": "Presentations\\Board_Presentation_Q1_Roadmap_Jan2026.md",
+      "question": "What is the shipping date for the Custom Dashboard Builder?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "6323403f-b0ff-4b28-b299-8159d85861a6",
+      "source_file": "Meeting_Notes\\Meeting_Product_Strategy_Nov3_2025.md",
+      "question": "What is the shipping date for the Custom Dashboard Builder?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "66e1d205-75a8-46e7-9127-059ad147fccc",
+      "source_file": "Meeting_Notes\\Meeting_Quarterly_Planning_Oct22_2025.md",
+      "question": "What was the date of the quarterly planning meeting?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "6eaa70d7-e12a-4bcf-b2d6-d58e6603a669",
+      "source_file": "Meeting_Notes\\Meeting_Design_Review_Dashboard_Nov20_2025.md",
+      "question": "Is the grid confirmed as a 12-column fixed snap?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "701e7f4c-d8b5-4d5b-b5a9-b5c24d2ee4a1",
+      "source_file": "Meeting_Notes\\Meeting_Product_Strategy_Nov3_2025.md",
+      "question": "What is the priority order for Q1 2026?",
+      "retrieved_count": 3,
+      "hit": true,
+      "precision": 0.3333333333333333,
+      "recall": 1,
+      "f1": 0.5
+    },
+    {
+      "chunk_id": "74618d7b-a495-4689-9f47-d7416a4fac79",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q2_2026_Draft.md",
+      "question": "What is the planned target for the self-serve redesign's time to value?",
+      "retrieved_count": 2,
+      "hit": true,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    },
+    {
+      "chunk_id": "7a08ad74-9aef-496f-bbbc-a966a142f289",
+      "source_file": "PRDs\\PRD_Workflow_Automation_Engine.md",
+      "question": "What is the maximum number of active workflows allowed in the Growth plan?",
+      "retrieved_count": 1,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "826228cc-8bca-4173-845a-c700e0e0a7c5",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q1_2026.md",
+      "question": "What is the target ship date for the Custom Dashboard Builder?",
+      "retrieved_count": 2,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "850cad67-1cf5-4aac-9b93-b7a346b7590c",
+      "source_file": "Meeting_Notes\\Meeting_Quarterly_Planning_Oct22_2025.md",
+      "question": "What is the deadline for confirming the feasibility of the WhatsApp Business API integration with a working prototype?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "8e28ceeb-a8cb-4bac-beaa-d2a5816929ac",
+      "source_file": "Presentations\\Board_Presentation_Q1_Roadmap_Jan2026.md",
+      "question": "What is the new monthly price for the Starter plan effective February 1, 2026?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "8f94ebd6-887b-401a-837f-73ab66295eb5",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "question": "What is the target date for fixing the \"Test alert\" button?",
+      "retrieved_count": 1,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "914eef56-ae9a-4f7c-ab4b-0f155f507ef1",
+      "source_file": "Test_Cases\\Test_Cases_Dashboard_Builder.md",
+      "question": "What is the expected result when searching for \"Salesforce integration roadmap\" in PM Compass?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "984beace-b494-41cf-8cab-68c1af306c93",
+      "source_file": "Effort_Estimation\\Effort_Estimation_Q1_2026.md",
+      "question": "What is the total number of points assigned to the Workflow Automation Engine feature?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "9f52b806-cb49-460d-91cb-b5f6b25a320c",
+      "source_file": "Meeting_Notes\\Meeting_Design_Review_Dashboard_Nov20_2025.md",
+      "question": "What was the decision made regarding the size and placement of the \"Add Widget\" button?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "a0266f2d-14f1-4973-a10c-78cc224520c8",
+      "source_file": "Decision_Logs\\Decision_Build_vs_Buy_Automation.md",
+      "question": "What is the estimated engineering cost for Option A?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "a3bfcb53-78b7-473f-8dc2-e3d326a97068",
+      "source_file": "Effort_Estimation\\Effort_Estimation_Q1_2026.md",
+      "question": "What is the total capacity in story points available for the team in Q1 2026 after accounting for the buffer?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "a50b39d6-735c-4b17-b350-eb00ed7d3219",
+      "source_file": "PRDs\\PRD_Unified_Inbox_v3.md",
+      "question": "What must happen to WhatsApp Business messages after they are received?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "a61a815c-93c5-4fb3-b985-a634fe4d9bf2",
+      "source_file": "Meeting_Notes\\Meeting_Sprint_Retro_Jan31_2026.md",
+      "question": "What was the velocity for Sprint 14?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "a7348306-cba6-4cb2-ad82-ecb8ac401f3d",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q1_2026.md",
+      "question": "What is the target for the churn rate in Q1 2026?",
+      "retrieved_count": 3,
+      "hit": true,
+      "precision": 0.3333333333333333,
+      "recall": 1,
+      "f1": 0.5
+    },
+    {
+      "chunk_id": "bcd989bf-4e11-49a6-8ae9-b9f55bfd38d4",
+      "source_file": "Decision_Logs\\Decision_Build_vs_Buy_Automation.md",
+      "question": "What is the maximum engineering cost before the decision to build native automation is re-evaluated?",
+      "retrieved_count": 2,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "c9bb0b1b-e8b0-434b-aa83-814e892c37be",
+      "source_file": "PRDs\\PRD_Custom_Dashboard_Builder.md",
+      "question": "What is the maximum load time for dashboards with up to 12 widgets?",
+      "retrieved_count": 1,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "ca2bdfe2-ab9f-4a02-b7a2-2fb8f0a8c120",
+      "source_file": "Effort_Estimation\\Effort_Estimation_Q1_2026.md",
+      "question": "What is the total number of points committed for Q1?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "d07538db-968b-4c97-bced-78327f61f164",
+      "source_file": "PRDs\\PRD_AI_Lead_Scoring_Engine.md",
+      "question": "What is the uptime requirement during business hours across APAC and EMEA time zones?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "d1da86f8-ea85-4c7d-82f9-d8f68c1a7a91",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q1_2026.md",
+      "question": "What is the target ship date for the Workflow Automation Engine?",
+      "retrieved_count": 3,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "d7c9fccb-84cb-4827-a526-75532428ea95",
+      "source_file": "Product_Roadmaps\\Product_Roadmap_Q1_2026.md",
+      "question": "What is the target ship date for the Unified Inbox v3?",
+      "retrieved_count": 3,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "d8edc76c-fb8c-4806-b607-dcaf437be1f9",
+      "source_file": "PRDs\\PRD_Custom_Dashboard_Builder.md",
+      "question": "What is the version and status of the Custom Dashboard Builder product?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "chunk_id": "f024b58c-5bb8-493c-af8a-77f07dfd7e15",
+      "source_file": "Decision_Logs\\Decision_Pricing_Model_Q1_2026.md",
+      "question": "What is the current pricing lock period for existing customers after the price change?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "f04900fc-66ef-4378-9354-40ac4731d0e3",
+      "source_file": "Meeting_Notes\\Meeting_Quarterly_Planning_Oct22_2025.md",
+      "question": "Who is responsible for delivering the pricing review recommendation?",
+      "retrieved_count": 0,
+      "hit": false,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "chunk_id": "f22a8367-414e-4004-92b8-fd050c244f4b",
+      "source_file": "Effort_Estimation\\Effort_Estimation_Q1_2026.md",
+      "question": "What action is taken if velocity falls below 85% for two consecutive sprints?",
+      "retrieved_count": 1,
+      "hit": true,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    }
+  ]
+}
