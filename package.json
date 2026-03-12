@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "ingest": "tsx scripts/ingest.ts"
+    "ingest": "tsx scripts/ingest.ts",
+    "generate-evals": "tsx scripts/generate-golden-dataset.ts",
+    "eval": "tsx scripts/eval.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
