@@ -17,9 +17,10 @@ interface Latency {
 }
 
 const EXAMPLE_QUERIES = [
-  'What was the build vs buy decision for automation?',
-  'What are the key features of Unified Inbox v3?',
-  'What did we decide on pricing for Q1 2026?',
+  'What was the build vs buy decision for the Unified Inbox?',
+  'What are the Q1 2026 initiatives and their owners?',
+  'What did we decide on AI Lead Scoring architecture?',
+  'What are the key risks on the product roadmap?',
 ]
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
   const [recentSearches, setRecentSearches] = useState<string[]>([])
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null)
   const [copied, setCopied] = useState(false)
+  const [selectedSource, setSelectedSource] = useState<Source | null>(null)
 
   async function handleSearch(searchQuery: string = query) {
     if (!searchQuery.trim()) return
@@ -45,6 +47,7 @@ export default function Home() {
     setLatency(null)
     setFeedback(null)
     setCopied(false)
+    setSelectedSource(null)
 
     try {
       const response = await fetch('/api/search', {
@@ -121,6 +124,7 @@ export default function Home() {
     setQuery('')
     setFeedback(null)
     setCopied(false)
+    setSelectedSource(null)
   }
 
   const hasResult = answer.length > 0
@@ -131,11 +135,11 @@ export default function Home() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-bold">P</span>
+          <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white text-base font-bold">P</span>
           </div>
           <div>
-            <h1 className="text-base font-semibold text-gray-900">PM Compass</h1>
+            <h1 className="text-lg font-semibold text-gray-900">PM Compass</h1>
             <p className="text-xs text-gray-400">AI knowledge assistant for Product Managers</p>
           </div>
         </div>
@@ -146,13 +150,13 @@ export default function Home() {
 
       <div className="max-w-3xl mx-auto px-6 py-10">
 
-        {/* Landing hero — only shown before first search */}
+        {/* Landing hero */}
         {!hasResult && !loading && (
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-3xl font-semibold text-gray-900 mb-3">
               Search your product knowledge
             </h2>
-            <p className="text-sm text-gray-500 max-w-lg mx-auto">
+            <p className="text-base text-gray-500 max-w-lg mx-auto leading-relaxed">
               Ask anything about your PRDs, roadmaps, meeting notes, and decisions.
               PM Compass retrieves the most relevant context and generates a cited answer.
             </p>
@@ -166,28 +170,28 @@ export default function Home() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder="e.g. What did we decide about pricing?"
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            placeholder="e.g. What did we decide about the Unified Inbox?"
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
           <button
             onClick={() => handleSearch()}
             disabled={loading || !query.trim()}
-            className="bg-blue-600 text-white px-5 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
 
-        {/* Example queries — wayfinders, shown on landing */}
+        {/* Example queries */}
         {!hasResult && !loading && recentSearches.length === 0 && (
           <div className="mt-5">
-            <p className="text-xs text-gray-400 mb-2">Try these examples</p>
+            <p className="text-sm text-gray-400 mb-2">Try these examples</p>
             <div className="flex flex-wrap gap-2">
               {EXAMPLE_QUERIES.map(q => (
                 <button
                   key={q}
                   onClick={() => { setQuery(q); handleSearch(q) }}
-                  className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1.5 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  className="text-sm bg-white border border-gray-200 rounded-full px-4 py-2 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
                 >
                   {q}
                 </button>
@@ -199,13 +203,13 @@ export default function Home() {
         {/* Recent searches */}
         {recentSearches.length > 0 && !hasResult && !loading && (
           <div className="mt-5">
-            <p className="text-xs text-gray-400 mb-2">Recent searches</p>
+            <p className="text-sm text-gray-400 mb-2">Recent searches</p>
             <div className="flex flex-wrap gap-2">
               {recentSearches.map(s => (
                 <button
                   key={s}
                   onClick={() => { setQuery(s); handleSearch(s) }}
-                  className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1.5 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  className="text-sm bg-white border border-gray-200 rounded-full px-4 py-2 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
                 >
                   {s}
                 </button>
@@ -216,7 +220,7 @@ export default function Home() {
 
         {/* Error */}
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-base text-red-700">
             {error}
           </div>
         )}
@@ -224,11 +228,11 @@ export default function Home() {
         {/* Loading skeleton */}
         {loading && !hasResult && (
           <div className="mt-8 bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
-            <div className="h-3 bg-gray-200 rounded w-16 mb-4"></div>
-            <div className="space-y-2">
-              <div className="h-3 bg-gray-100 rounded w-full"></div>
-              <div className="h-3 bg-gray-100 rounded w-5/6"></div>
-              <div className="h-3 bg-gray-100 rounded w-4/6"></div>
+            <div className="h-4 bg-gray-200 rounded w-16 mb-4"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-100 rounded w-full"></div>
+              <div className="h-4 bg-gray-100 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-100 rounded w-4/6"></div>
             </div>
           </div>
         )}
@@ -239,26 +243,26 @@ export default function Home() {
 
             {/* Answer */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Answer</p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Answer</p>
                 {!streaming && (
                   <button
                     onClick={handleCopy}
-                    className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {copied ? '✓ Copied' : 'Copy'}
                   </button>
                 )}
               </div>
-              <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap">
                 {answer}
                 {streaming && <span className="animate-pulse">▌</span>}
               </p>
 
-              {/* Feedback — shown after streaming completes */}
+              {/* Feedback */}
               {!streaming && (
                 <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3">
-                  <p className="text-xs text-gray-400">Was this helpful?</p>
+                  <p className="text-sm text-gray-400">Was this helpful?</p>
                   <button
                     onClick={() => setFeedback('up')}
                     className={`text-sm px-2 py-1 rounded transition-colors ${feedback === 'up' ? 'bg-green-50 text-green-600' : 'text-gray-400 hover:text-green-600'}`}
@@ -272,8 +276,8 @@ export default function Home() {
                     👎
                   </button>
                   {feedback && (
-                    <span className="text-xs text-gray-400">
-                      {feedback === 'up' ? 'Thanks for the feedback!' : 'Got it — we\'ll work on improving this.'}
+                    <span className="text-sm text-gray-400">
+                      {feedback === 'up' ? 'Thanks for the feedback!' : "Got it — we'll work on improving this."}
                     </span>
                   )}
                 </div>
@@ -283,15 +287,15 @@ export default function Home() {
             {/* Sources */}
             {sources.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+                <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
                   Sources — {sources.length} document{sources.length > 1 ? 's' : ''} retrieved
                 </p>
                 <div className="space-y-3">
                   {sources.map((source, i) => (
                     <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-xs font-medium text-gray-700 truncate">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="text-sm font-semibold text-gray-800 truncate">
                             [{i + 1}] {source.source_name || source.source_file.replace(/\\/g, '/')}
                           </span>
                           {source.source_file.startsWith('https://docs.google.com/') && (
@@ -299,21 +303,29 @@ export default function Home() {
                               href={source.source_file}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs text-blue-500 hover:text-blue-700 whitespace-nowrap shrink-0"
+                              className="text-sm text-blue-500 hover:text-blue-700 whitespace-nowrap shrink-0"
                             >
                               Open in Drive ↗
                             </a>
                           )}
                         </div>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ml-2 shrink-0 ${
-                          source.score >= 0.5 ? 'bg-green-50 text-green-600' :
-                          source.score >= 0.35 ? 'bg-yellow-50 text-yellow-600' :
-                          'bg-gray-50 text-gray-500'
-                        }`}>
-                          {(source.score * 100).toFixed(0)}% match
-                        </span>
+                        <div className="flex items-center gap-2 ml-2 shrink-0">
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            source.score >= 0.5 ? 'bg-green-50 text-green-600' :
+                            source.score >= 0.35 ? 'bg-yellow-50 text-yellow-600' :
+                            'bg-gray-50 text-gray-500'
+                          }`}>
+                            {(source.score * 100).toFixed(0)}% match
+                          </span>
+                          <button
+                            onClick={() => setSelectedSource(selectedSource?.source_file === source.source_file && selectedSource?.chunk_index === i ? null : source)}
+                            className="text-xs text-gray-400 hover:text-blue-600 border border-gray-200 hover:border-blue-300 rounded px-2 py-0.5 transition-colors"
+                          >
+                            View details
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">{source.content}</p>
+                      <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{source.content}</p>
                     </div>
                   ))}
                 </div>
@@ -322,7 +334,7 @@ export default function Home() {
 
             {/* Latency breakdown */}
             {latency && (
-              <div className="bg-white border border-gray-100 rounded-lg px-4 py-3 flex flex-wrap gap-4 text-xs text-gray-400">
+              <div className="bg-white border border-gray-100 rounded-lg px-4 py-3 flex flex-wrap gap-4 text-sm text-gray-400">
                 <span className="font-medium text-gray-500">Pipeline latency</span>
                 <span>Embedding: {latency.embedding_ms}ms</span>
                 <span>Search: {latency.search_ms}ms</span>
@@ -335,7 +347,7 @@ export default function Home() {
             {!streaming && (
               <button
                 onClick={handleReset}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-base text-blue-600 hover:underline"
               >
                 ← New search
               </button>
@@ -343,6 +355,38 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Side panel */}
+      {selectedSource && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/20" onClick={() => setSelectedSource(null)} />
+          <div className="relative bg-white w-full max-w-md shadow-xl flex flex-col h-full">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+              <div>
+                <p className="text-base font-semibold text-gray-900">{selectedSource.source_name || 'Document'}</p>
+                <p className="text-sm text-gray-400 mt-0.5">{(selectedSource.score * 100).toFixed(0)}% match</p>
+              </div>
+              <button onClick={() => setSelectedSource(null)} className="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Matching passage</p>
+              <p className="text-base text-gray-700 leading-relaxed">{selectedSource.content}</p>
+            </div>
+            {selectedSource.source_file.startsWith('https://docs.google.com/') && (
+              <div className="px-6 py-5 border-t border-gray-200">
+                <a
+                  href={selectedSource.source_file}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-base font-medium py-3 rounded-lg transition-colors"
+                >
+                  Open in Google Drive ↗
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   )
 }
