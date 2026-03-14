@@ -318,7 +318,7 @@ export default function Home() {
                             {(source.score * 100).toFixed(0)}% match
                           </span>
                           <button
-                            onClick={() => setSelectedSource(selectedSource?.source_file === source.source_file && selectedSource?.chunk_index === i ? null : source)}
+                            onClick={() => setSelectedSource(selectedSource?.content === source.content ? null : source)}
                             className="text-xs text-gray-400 hover:text-blue-600 border border-gray-200 hover:border-blue-300 rounded px-2 py-0.5 transition-colors"
                           >
                             View details
