@@ -244,7 +244,7 @@ export default function Home() {
             {/* Answer */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Answer</p>
+                <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Answer</p>
                 {!streaming && (
                   <button
                     onClick={handleCopy}
@@ -254,7 +254,7 @@ export default function Home() {
                   </button>
                 )}
               </div>
-              <p className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
                 {answer}
                 {streaming && <span className="animate-pulse">▌</span>}
               </p>
@@ -287,7 +287,7 @@ export default function Home() {
             {/* Sources */}
             {sources.length > 0 && (
               <div>
-                <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
                   Sources — {sources.length} document{sources.length > 1 ? 's' : ''} retrieved
                 </p>
                 <div className="space-y-3">
@@ -369,8 +369,8 @@ export default function Home() {
               <button onClick={() => setSelectedSource(null)} className="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Matching passage</p>
-              <p className="text-base text-gray-700 leading-relaxed">{selectedSource.content}</p>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Matching passage</p>
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
             </div>
             {selectedSource.source_file.startsWith('https://docs.google.com/') && (
               <div className="px-6 py-5 border-t border-gray-200">
