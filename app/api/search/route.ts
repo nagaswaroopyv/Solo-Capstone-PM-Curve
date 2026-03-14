@@ -37,6 +37,9 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 
+  console.log('[DEBUG] chunk keys:', chunks[0] ? Object.keys(chunks[0]) : 'no chunks')
+  console.log('[DEBUG] source_name:', chunks[0]?.source_name)
+
   // Step 2b: Relevance threshold
   const RELEVANCE_THRESHOLD = 0.30
   const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
