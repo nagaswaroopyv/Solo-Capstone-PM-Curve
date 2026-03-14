@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
         type: 'sources',
         sources: relevantChunks.map((c: any) => ({
           source_file: c.source_file,
+          source_name: c.source_name,
           content: c.content,
           score: c.combined_score,
         })),

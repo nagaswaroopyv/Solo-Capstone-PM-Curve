@@ -97,6 +97,7 @@ async function ingestDrive() {
         content: chunks[i],
         embedding: embeddingResponse.data[0].embedding,
         source_file: driveUrl,
+        source_name: file.name,
         chunk_index: i,
       })
 

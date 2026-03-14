@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 interface Source {
   source_file: string
+  source_name: string
   content: string
   score: number
 }
@@ -291,18 +292,14 @@ export default function Home() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="text-xs font-medium text-gray-700 truncate">
-                            [{i + 1}] {source.source_file.startsWith('https://docs.google.com/')
-                              ? source.source_file.split('/d/')[1]?.split('/')[0]
-                                ? decodeURIComponent(source.source_file).replace(/.*\//, '').replace('/edit', '')
-                                : source.source_file
-                              : source.source_file.replace(/\\/g, '/')}
+                            [{i + 1}] {source.source_name || source.source_file.replace(/\\/g, '/')}
                           </span>
                           {source.source_file.startsWith('https://docs.google.com/') && (
                             <a
                               href={source.source_file}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs text-blue-500 hover:text-blue-700 whitespace-nowrap flex items-center gap-1"
+                              className="text-xs text-blue-500 hover:text-blue-700 whitespace-nowrap shrink-0"
                             >
                               Open in Drive ↗
                             </a>
