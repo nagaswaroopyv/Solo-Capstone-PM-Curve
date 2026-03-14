@@ -37,12 +37,19 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 
-  console.log('[DEBUG] chunk keys:', chunks[0] ? Object.keys(chunks[0]) : 'no chunks')
-  console.log('[DEBUG] source_name:', chunks[0]?.source_name)
-
   // Step 2b: Relevance threshold
   const RELEVANCE_THRESHOLD = 0.30
   const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
+
+  // Step 2c: Fetch source_name separately (RPC doesn't reliably return it)
+  const chunkIds = relevantChunks.map((c: any) => c.id)
+  const { data: sourceNames } = await supabase
+    .from('documents')
+    .select('id, source_name')
+    .in('id', chunkIds)
+  const sourceNameMap = Object.fromEntries(
+    (sourceNames || []).map((r: any) => [r.id, r.source_name])
+  )
 
   if (relevantChunks.length === 0) {
     const payload = JSON.stringify({
@@ -87,7 +94,7 @@ export async function POST(request: NextRequest) {
         type: 'sources',
         sources: relevantChunks.map((c: any) => ({
           source_file: c.source_file,
-          source_name: c.source_name,
+          source_name: sourceNameMap[c.id] || c.source_name,
           content: c.content,
           score: c.combined_score,
         })),
