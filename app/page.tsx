@@ -34,6 +34,8 @@ export default function Home() {
   const [recentSearches, setRecentSearches] = useState<string[]>([])
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null)
   const [copied, setCopied] = useState(false)
+  const [copiedChunk, setCopiedChunk] = useState<number | null>(null)
+  const [copiedPanel, setCopiedPanel] = useState(false)
   const [selectedSource, setSelectedSource] = useState<Source | null>(null)
 
   async function handleSearch(searchQuery: string = query) {
@@ -318,6 +320,16 @@ export default function Home() {
                             {(source.score * 100).toFixed(0)}% match
                           </span>
                           <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(source.content)
+                              setCopiedChunk(i)
+                              setTimeout(() => setCopiedChunk(null), 2000)
+                            }}
+                            className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
+                          >
+                            {copiedChunk === i ? '✓ Copied' : 'Copy'}
+                          </button>
+                          <button
                             onClick={() => setSelectedSource(selectedSource?.content === source.content ? null : source)}
                             className="text-xs text-gray-400 hover:text-blue-600 border border-gray-200 hover:border-blue-300 rounded px-2 py-0.5 transition-colors"
                           >
@@ -369,7 +381,19 @@ export default function Home() {
               <button onClick={() => setSelectedSource(null)} className="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Matching passage</p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Matching passage</p>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedSource.content)
+                    setCopiedPanel(true)
+                    setTimeout(() => setCopiedPanel(false), 2000)
+                  }}
+                  className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
+                >
+                  {copiedPanel ? '✓ Copied' : 'Copy'}
+                </button>
+              </div>
               <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
             </div>
             {selectedSource.source_file.startsWith('https://docs.google.com/') && (
