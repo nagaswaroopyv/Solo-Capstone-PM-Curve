@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
+import { CohereClient } from 'cohere-ai'
 import { NextRequest } from 'next/server'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const cohere = new CohereClient({ token: process.env.COHERE_API_KEY })
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -25,11 +27,11 @@ export async function POST(request: NextRequest) {
   const queryEmbedding = embeddingResponse.data[0].embedding
   const t1 = Date.now()
 
-  // Step 2: Hybrid search — semantic + keyword combined
+  // Step 2: Hybrid search — semantic + keyword combined, fetch top 10 candidates
   const { data: chunks, error } = await supabase.rpc('hybrid_search', {
     query_text: query,
     query_embedding: `[${queryEmbedding.join(',')}]`,
-    match_count: 3,
+    match_count: 10,
   })
   const t2 = Date.now()
 
@@ -39,7 +41,21 @@ export async function POST(request: NextRequest) {
 
   // Step 2b: Relevance threshold
   const RELEVANCE_THRESHOLD = 0.30
-  const relevantChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
+  const thresholdChunks = chunks.filter((c: any) => c.combined_score >= RELEVANCE_THRESHOLD)
+
+  // Step 2c: Rerank — re-score candidates by true semantic relevance, take top 3
+  let relevantChunks = thresholdChunks
+  if (thresholdChunks.length > 1) {
+    const rerankResponse = await cohere.rerank({
+      model: 'rerank-v3.5',
+      query,
+      documents: thresholdChunks.map((c: any) => c.content),
+      topN: 3,
+    })
+    relevantChunks = rerankResponse.results.map(
+      (r: any) => thresholdChunks[r.index]
+    )
+  }
 
   // Step 2c: Fetch source_name separately (RPC doesn't reliably return it)
   const chunkIds = relevantChunks.map((c: any) => c.id)
@@ -76,7 +92,8 @@ export async function POST(request: NextRequest) {
 - Always cite sources using [1], [2], [3] notation.
 - Only state something as a confirmed fact if the document explicitly records it as a decision or commitment.
 - If the document describes something as speculative, under consideration, or not yet decided — say so explicitly. Never present uncertain information as fact.
-- If the answer is not clearly supported by the provided chunks, say "I could not find a confirmed answer in the available documents." Do not infer or guess.`,
+- If the answer is not clearly supported by the provided chunks, say "I could not find a confirmed answer in the available documents." Do not infer or guess.
+- Do not perform calculations, derive totals, or aggregate numbers. Only report figures that are explicitly stated in the documents.`,
       },
       {
         role: 'user',
