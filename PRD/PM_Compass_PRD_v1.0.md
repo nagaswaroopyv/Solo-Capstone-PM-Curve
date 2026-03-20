@@ -416,7 +416,7 @@ Question → [RETRIEVAL] → Chunks → [GENERATION] → Answer
 | Faithfulness (1–5) | Are all claims in the answer directly supported by the retrieved chunks? | Hallucination |
 | Answer Relevance (1–5) | Does the answer actually address the question asked? | Off-topic response |
 
-**Results (20-question sample, run on 52-chunk corpus):**
+**Results (20-question sample, run on 52-chunk corpus — initial baseline):**
 
 | Metric | Score | Interpretation |
 |---|---|---|
@@ -424,10 +424,18 @@ Question → [RETRIEVAL] → Chunks → [GENERATION] → Answer
 | Avg Answer Relevance | 5.00 / 5 | High — note: inflated by self-evaluation bias (see limitations) |
 | Questions evaluated | 18 / 20 | 2 skipped due to no chunks passing threshold |
 
+**Results (19-question sample, run on 67-chunk Drive corpus — current baseline):**
+
+| Metric | Score | Interpretation |
+|---|---|---|
+| Avg Faithfulness | 4.86 / 5 | Strong — consistent with initial baseline |
+| Avg Answer Relevance | 5.0 / 5 | Inflated — auto judge cannot detect attribution hallucinations (see Layer 3) |
+| Questions evaluated | 14 / 19 | 2 graceful failures, 3 timeouts excluded |
+
 **Known limitations:**
 1. **Self-evaluation bias** — GPT-4o-mini judges answers it effectively wrote. In production, upgrade judge to GPT-4o for independent evaluation.
-2. **Lenient on "I don't know" answers** — judge scores graceful failures as 5/5 relevant, which masks retrieval failures. Retrieval eval catches this gap.
-3. **Sample size** — 20 questions is sufficient for v1 baseline; expand to full 52 as dataset grows.
+2. **Cannot detect attribution hallucinations** — judge scores answers as relevant even when the named person is wrong. Manual eval (Layer 3) is required for this.
+3. **Lenient on "I don't know" answers** — judge scores graceful failures as 5/5 relevant, which masks retrieval failures. Retrieval eval catches this gap.
 
 ### How the Two Layers Complement Each Other
 
@@ -457,10 +465,12 @@ Question → [RETRIEVAL] → Chunks → [GENERATION] → Answer
 |---|---|
 | Precision (word overlap) | 67% |
 | Recall | 3.9 / 5 |
-| Faithfulness | 4.5 / 5 |
-| Answer Relevance | 3.7 / 5 |
+| Faithfulness | 4.1 / 5 |
+| Answer Relevance | 3.1 / 5 |
 | Hallucination Rate | 28% (5/19 questions) |
-| Pass Rate | 63% (12 pass, 3 partial pass, 4 fail) |
+| Pass Rate | 63% (12/19) |
+| Partial Pass | 16% (3/19) |
+| Fail | 21% (4/19) |
 
 **Failure analysis:** All 4 failures involve attribution hallucination — the correct document is retrieved but the model names the wrong person. Root cause: fixed-size chunking cuts across ownership context. Multiple people mentioned in the same chunk confuse the model on attribution. Graceful failures (system returned "I don't know") all scored Pass.
 
