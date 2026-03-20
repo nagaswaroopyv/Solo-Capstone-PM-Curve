@@ -109,8 +109,9 @@ export default function Home() {
       setRecentSearches(prev =>
         [searchQuery, ...prev.filter(s => s !== searchQuery)].slice(0, 5)
       )
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong'
+      setError(message)
     } finally {
       setLoading(false)
       setStreaming(false)
@@ -131,73 +132,92 @@ export default function Home() {
     setFeedback(null)
     setCopied(false)
     setSelectedSource(null)
+    setSummary(null)
   }
 
   const hasResult = answer.length > 0
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-surface">
 
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-border/40 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-base font-bold">P</span>
+          <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-manrope)' }}>P</span>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">PM Compass</h1>
-            <p className="text-xs text-gray-400">AI knowledge assistant for Product Managers</p>
-          </div>
+          <span className="font-headline font-bold text-lg text-text-primary tracking-tight">PM Compass</span>
+          <span className="pill bg-brand-dim text-brand">v1 · Prototype</span>
         </div>
-        <span className="text-xs bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-3 py-1 font-medium">
-          v1 — Prototype
-        </span>
-      </div>
+        <a
+          href="https://github.com/nagaswaroopyv/Solo-Capstone-PM-Curve"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex text-sm font-medium text-text-secondary border border-border rounded-full px-4 py-1.5 hover:bg-surface-low transition-colors"
+        >
+          GitHub ↗
+        </a>
+      </header>
 
       <div className="max-w-3xl mx-auto px-6 py-10">
 
-        {/* Landing hero */}
+        {/* ── Hero (no results) ── */}
         {!hasResult && !loading && (
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-3">
+          <div className="mb-10 text-center fade-up">
+            <div className="inline-flex items-center gap-2 pill bg-brand-dim text-brand mb-5">
+              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>explore</span>
+              Connected to Google Drive · 14 docs · 67 chunks
+            </div>
+            <h2 className="font-headline font-bold text-4xl text-text-primary tracking-tight mb-4 leading-tight">
               Search your product knowledge
             </h2>
-            <p className="text-base text-gray-500 max-w-lg mx-auto leading-relaxed">
+            <p className="text-base text-text-secondary max-w-lg mx-auto leading-relaxed">
               Ask anything about your PRDs, roadmaps, meeting notes, and decisions.
               PM Compass retrieves the most relevant context and generates a cited answer.
             </p>
           </div>
         )}
 
-        {/* Search bar */}
+        {/* ── Search bar ── */}
         <div className="flex gap-2">
-          <input
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder="e.g. What did we decide about the Unified Inbox?"
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          />
+          <div className="flex-1 flex items-center gap-3 bg-white border border-border/60 rounded-2xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-brand/30 focus-within:border-brand/50 transition-all">
+            <span className="material-symbols-outlined text-text-muted shrink-0">search</span>
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              placeholder="e.g. What did we decide about the Unified Inbox?"
+              className="flex-1 text-sm text-text-primary placeholder-text-muted bg-transparent focus:outline-none"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                className="text-text-muted hover:text-text-secondary transition-colors text-lg leading-none shrink-0"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <button
             onClick={() => handleSearch()}
             disabled={loading || !query.trim()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="bg-brand text-white px-5 py-3 rounded-2xl text-sm font-semibold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm shadow-brand/20"
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? 'Searching…' : 'Search'}
           </button>
         </div>
 
-        {/* Example queries */}
+        {/* ── Example queries ── */}
         {!hasResult && !loading && recentSearches.length === 0 && (
-          <div className="mt-5">
-            <p className="text-sm text-gray-400 mb-2">Try these examples</p>
+          <div className="mt-5 fade-up">
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">Try these examples</p>
             <div className="flex flex-wrap gap-2">
               {EXAMPLE_QUERIES.map(q => (
                 <button
                   key={q}
                   onClick={() => { setQuery(q); handleSearch(q) }}
-                  className="text-sm bg-white border border-gray-200 rounded-full px-4 py-2 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  className="text-sm bg-white border border-border/50 rounded-full px-4 py-2 text-text-secondary hover:border-brand/40 hover:text-brand transition-colors"
                 >
                   {q}
                 </button>
@@ -206,16 +226,16 @@ export default function Home() {
           </div>
         )}
 
-        {/* Recent searches */}
+        {/* ── Recent searches ── */}
         {recentSearches.length > 0 && !hasResult && !loading && (
           <div className="mt-5">
-            <p className="text-sm text-gray-400 mb-2">Recent searches</p>
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">Recent searches</p>
             <div className="flex flex-wrap gap-2">
               {recentSearches.map(s => (
                 <button
                   key={s}
                   onClick={() => { setQuery(s); handleSearch(s) }}
-                  className="text-sm bg-white border border-gray-200 rounded-full px-4 py-2 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  className="text-sm bg-white border border-border/50 rounded-full px-4 py-2 text-text-secondary hover:border-brand/40 hover:text-brand transition-colors"
                 >
                   {s}
                 </button>
@@ -224,66 +244,69 @@ export default function Home() {
           </div>
         )}
 
-        {/* Error */}
+        {/* ── Error ── */}
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-base text-red-700">
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700">
             {error}
           </div>
         )}
 
-        {/* Loading skeleton */}
+        {/* ── Loading skeleton ── */}
         {loading && !hasResult && (
-          <div className="mt-8 bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-16 mb-4"></div>
+          <div className="mt-8 bg-white border border-border/40 rounded-3xl p-6 shadow-sm animate-pulse">
+            <div className="h-3 bg-surface-high rounded w-16 mb-5"></div>
             <div className="space-y-3">
-              <div className="h-4 bg-gray-100 rounded w-full"></div>
-              <div className="h-4 bg-gray-100 rounded w-5/6"></div>
-              <div className="h-4 bg-gray-100 rounded w-4/6"></div>
+              <div className="h-3 bg-surface-mid rounded w-full"></div>
+              <div className="h-3 bg-surface-mid rounded w-5/6"></div>
+              <div className="h-3 bg-surface-mid rounded w-4/6"></div>
             </div>
           </div>
         )}
 
-        {/* Results */}
+        {/* ── Results ── */}
         {hasResult && (
-          <div className="mt-8 space-y-6">
+          <div className="mt-8 space-y-4 fade-up">
 
             {/* Answer */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white border border-border/40 rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Answer</p>
+                <span className="pill bg-brand-dim text-brand">Answer</span>
                 {!streaming && (
                   <button
                     onClick={handleCopy}
-                    className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-text-muted hover:text-text-secondary transition-colors"
                   >
-                    {copied ? '✓ Copied' : 'Copy'}
+                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                      {copied ? 'check' : 'content_copy'}
+                    </span>
+                    {copied ? 'Copied' : 'Copy'}
                   </button>
                 )}
               </div>
-              <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">
                 {answer}
-                {streaming && <span className="animate-pulse">▌</span>}
+                {streaming && <span className="cursor-blink ml-0.5 text-brand">▌</span>}
               </p>
 
               {/* Feedback */}
               {!streaming && (
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3">
-                  <p className="text-sm text-gray-400">Was this helpful?</p>
+                <div className="mt-4 pt-4 border-t border-border/20 flex items-center gap-3">
+                  <p className="text-sm text-text-muted">Was this helpful?</p>
                   <button
                     onClick={() => setFeedback('up')}
-                    className={`text-sm px-2 py-1 rounded transition-colors ${feedback === 'up' ? 'bg-green-50 text-green-600' : 'text-gray-400 hover:text-green-600'}`}
+                    className={`text-sm px-2 py-1 rounded-lg transition-colors ${feedback === 'up' ? 'bg-green-50 text-green-600' : 'text-text-muted hover:text-green-600'}`}
                   >
                     👍
                   </button>
                   <button
                     onClick={() => setFeedback('down')}
-                    className={`text-sm px-2 py-1 rounded transition-colors ${feedback === 'down' ? 'bg-red-50 text-red-600' : 'text-gray-400 hover:text-red-600'}`}
+                    className={`text-sm px-2 py-1 rounded-lg transition-colors ${feedback === 'down' ? 'bg-red-50 text-red-600' : 'text-text-muted hover:text-red-500'}`}
                   >
                     👎
                   </button>
                   {feedback && (
-                    <span className="text-sm text-gray-400">
-                      {feedback === 'up' ? 'Thanks for the feedback!' : "Got it — we'll work on improving this."}
+                    <span className="text-sm text-text-muted">
+                      {feedback === 'up' ? 'Thanks!' : "Got it — we'll improve this."}
                     </span>
                   )}
                 </div>
@@ -293,15 +316,15 @@ export default function Home() {
             {/* Sources */}
             {sources.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+                <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">
                   Sources — {sources.length} document{sources.length > 1 ? 's' : ''} retrieved
                 </p>
                 <div className="space-y-3">
                   {sources.map((source, i) => (
-                    <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span className="text-sm font-semibold text-gray-800 truncate">
+                    <div key={i} className="bg-white border border-border/40 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="text-sm font-semibold text-text-primary truncate">
                             [{i + 1}] {source.source_name || source.source_file.replace(/\\/g, '/')}
                           </span>
                           {source.source_file.startsWith('https://docs.google.com/') && (
@@ -309,17 +332,18 @@ export default function Home() {
                               href={source.source_file}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-500 hover:text-blue-700 whitespace-nowrap shrink-0"
+                              className="text-xs text-brand hover:underline whitespace-nowrap shrink-0 flex items-center gap-1"
                             >
-                              Open in Drive ↗
+                              <span className="material-symbols-outlined" style={{ fontSize: 12 }}>open_in_new</span>
+                              Drive
                             </a>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 ml-2 shrink-0">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                            source.score >= 0.5 ? 'bg-green-50 text-green-600' :
-                            source.score >= 0.35 ? 'bg-yellow-50 text-yellow-600' :
-                            'bg-gray-50 text-gray-500'
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className={`pill text-[10px] ${
+                            source.score >= 0.5 ? 'bg-green-50 text-green-700' :
+                            source.score >= 0.35 ? 'bg-yellow-50 text-yellow-700' :
+                            'bg-surface-mid text-text-muted'
                           }`}>
                             {(source.score * 100).toFixed(0)}% match
                           </span>
@@ -329,9 +353,9 @@ export default function Home() {
                               setCopiedChunk(i)
                               setTimeout(() => setCopiedChunk(null), 2000)
                             }}
-                            className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
+                            className="text-xs text-text-muted hover:text-text-secondary border border-border/50 rounded-lg px-2 py-0.5 transition-colors"
                           >
-                            {copiedChunk === i ? '✓ Copied' : 'Copy'}
+                            {copiedChunk === i ? '✓' : 'Copy'}
                           </button>
                           <button
                             onClick={() => {
@@ -339,27 +363,27 @@ export default function Home() {
                               setPanelTab('chunk')
                               setSummary(null)
                             }}
-                            className="text-xs text-gray-400 hover:text-blue-600 border border-gray-200 hover:border-blue-300 rounded px-2 py-0.5 transition-colors"
+                            className="text-xs text-brand border border-brand/30 hover:bg-brand-dim rounded-lg px-2 py-0.5 transition-colors"
                           >
                             View details
                           </button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{source.content}</p>
+                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2">{source.content}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Latency breakdown */}
+            {/* Latency */}
             {latency && (
-              <div className="bg-white border border-gray-100 rounded-lg px-4 py-3 flex flex-wrap gap-4 text-sm text-gray-400">
-                <span className="font-medium text-gray-500">Pipeline latency</span>
+              <div className="bg-white border border-border/30 rounded-2xl px-5 py-3 flex flex-wrap gap-4 text-xs text-text-muted">
+                <span className="font-semibold text-text-secondary">Pipeline latency</span>
                 <span>Embedding: {latency.embedding_ms}ms</span>
                 <span>Search: {latency.search_ms}ms</span>
                 <span>LLM: {latency.llm_ms}ms</span>
-                <span className="font-medium text-gray-600">Total: {latency.total_ms}ms</span>
+                <span className="font-semibold text-text-primary">Total: {latency.total_ms}ms</span>
               </div>
             )}
 
@@ -367,32 +391,43 @@ export default function Home() {
             {!streaming && (
               <button
                 onClick={handleReset}
-                className="text-base text-blue-600 hover:underline"
+                className="text-sm text-brand hover:underline flex items-center gap-1"
               >
-                ← New search
+                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_back</span>
+                New search
               </button>
             )}
           </div>
         )}
       </div>
 
-      {/* Side panel */}
+      {/* ── Side panel ── */}
       {selectedSource && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/20" onClick={() => setSelectedSource(null)} />
-          <div className="relative bg-white w-full max-w-md shadow-xl flex flex-col h-full">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setSelectedSource(null)} />
+          <div className="relative bg-white w-full max-w-md shadow-2xl flex flex-col h-full border-l border-border/40">
+
+            {/* Panel header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-border/30">
               <div>
-                <p className="text-base font-semibold text-gray-900">{selectedSource.source_name || 'Document'}</p>
-                <p className="text-sm text-gray-400 mt-0.5">{(selectedSource.score * 100).toFixed(0)}% match</p>
+                <p className="text-sm font-semibold text-text-primary">{selectedSource.source_name || 'Document'}</p>
+                <p className="text-xs text-text-muted mt-0.5">{(selectedSource.score * 100).toFixed(0)}% match</p>
               </div>
-              <button onClick={() => setSelectedSource(null)} className="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
+              <button
+                onClick={() => setSelectedSource(null)}
+                className="text-text-muted hover:text-text-secondary text-xl font-light leading-none transition-colors"
+              >
+                ✕
+              </button>
             </div>
+
             {/* Tabs */}
-            <div className="flex border-b border-gray-200 px-6">
+            <div className="flex border-b border-border/30 px-6">
               <button
                 onClick={() => setPanelTab('chunk')}
-                className={`text-sm font-medium py-3 mr-6 border-b-2 transition-colors ${panelTab === 'chunk' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                className={`text-sm font-medium py-3 mr-6 border-b-2 transition-colors ${
+                  panelTab === 'chunk' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-secondary'
+                }`}
               >
                 Matching passage
               </button>
@@ -411,46 +446,60 @@ export default function Home() {
                     setSummaryLoading(false)
                   }
                 }}
-                className={`text-sm font-medium py-3 border-b-2 transition-colors ${panelTab === 'summary' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                className={`text-sm font-medium py-3 border-b-2 transition-colors ${
+                  panelTab === 'summary' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-secondary'
+                }`}
               >
                 Summarize doc
               </button>
             </div>
 
+            {/* Panel body */}
             <div className="flex-1 overflow-y-auto px-6 py-5">
               {panelTab === 'chunk' && (
                 <>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Matching passage</p>
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Matching passage</p>
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(selectedSource.content)
                         setCopiedPanel(true)
                         setTimeout(() => setCopiedPanel(false), 2000)
                       }}
-                      className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
+                      className="flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary border border-border/50 rounded-lg px-2 py-0.5 transition-colors"
                     >
-                      {copiedPanel ? '✓ Copied' : 'Copy'}
+                      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>
+                        {copiedPanel ? 'check' : 'content_copy'}
+                      </span>
+                      {copiedPanel ? 'Copied' : 'Copy'}
                     </button>
                   </div>
-                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
+                  <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
                 </>
               )}
               {panelTab === 'summary' && (
                 summaryLoading
-                  ? <p className="text-sm text-gray-400 animate-pulse">Summarizing document...</p>
-                  : <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{summary}</p>
+                  ? (
+                    <div className="flex items-center gap-2 text-sm text-text-muted">
+                      <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+                      Summarizing document…
+                    </div>
+                  )
+                  : <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">{summary}</p>
               )}
             </div>
+
+            {/* Panel footer */}
             {selectedSource.source_file.startsWith('https://docs.google.com/') && (
-              <div className="px-6 py-5 border-t border-gray-200">
+              <div className="px-6 py-5 border-t border-border/30">
                 <a
                   href={selectedSource.source_file}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-base font-medium py-3 rounded-lg transition-colors"
+                  className="flex items-center justify-center gap-2 w-full bg-brand hover:brightness-110 text-white text-sm font-semibold py-3 rounded-xl transition-all"
                 >
-                  Open in Google Drive ↗
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>open_in_new</span>
+                  Open in Google Drive
                 </a>
               </div>
             )}
