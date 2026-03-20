@@ -37,6 +37,9 @@ export default function Home() {
   const [copiedChunk, setCopiedChunk] = useState<number | null>(null)
   const [copiedPanel, setCopiedPanel] = useState(false)
   const [selectedSource, setSelectedSource] = useState<Source | null>(null)
+  const [panelTab, setPanelTab] = useState<'chunk' | 'summary'>('chunk')
+  const [summary, setSummary] = useState<string | null>(null)
+  const [summaryLoading, setSummaryLoading] = useState(false)
 
   async function handleSearch(searchQuery: string = query) {
     if (!searchQuery.trim()) return
@@ -330,7 +333,11 @@ export default function Home() {
                             {copiedChunk === i ? '✓ Copied' : 'Copy'}
                           </button>
                           <button
-                            onClick={() => setSelectedSource(selectedSource?.content === source.content ? null : source)}
+                            onClick={() => {
+                              setSelectedSource(selectedSource?.content === source.content ? null : source)
+                              setPanelTab('chunk')
+                              setSummary(null)
+                            }}
                             className="text-xs text-gray-400 hover:text-blue-600 border border-gray-200 hover:border-blue-300 rounded px-2 py-0.5 transition-colors"
                           >
                             View details
@@ -380,21 +387,59 @@ export default function Home() {
               </div>
               <button onClick={() => setSelectedSource(null)} className="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
             </div>
+            {/* Tabs */}
+            <div className="flex border-b border-gray-200 px-6">
+              <button
+                onClick={() => setPanelTab('chunk')}
+                className={`text-sm font-medium py-3 mr-6 border-b-2 transition-colors ${panelTab === 'chunk' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                Matching passage
+              </button>
+              <button
+                onClick={async () => {
+                  setPanelTab('summary')
+                  if (!summary) {
+                    setSummaryLoading(true)
+                    const res = await fetch('/api/summarize', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ source_file: selectedSource.source_file, source_name: selectedSource.source_name }),
+                    })
+                    const data = await res.json()
+                    setSummary(data.summary || 'Could not generate summary.')
+                    setSummaryLoading(false)
+                  }
+                }}
+                className={`text-sm font-medium py-3 border-b-2 transition-colors ${panelTab === 'summary' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                Summarize doc
+              </button>
+            </div>
+
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Matching passage</p>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(selectedSource.content)
-                    setCopiedPanel(true)
-                    setTimeout(() => setCopiedPanel(false), 2000)
-                  }}
-                  className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
-                >
-                  {copiedPanel ? '✓ Copied' : 'Copy'}
-                </button>
-              </div>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
+              {panelTab === 'chunk' && (
+                <>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Matching passage</p>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(selectedSource.content)
+                        setCopiedPanel(true)
+                        setTimeout(() => setCopiedPanel(false), 2000)
+                      }}
+                      className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
+                    >
+                      {copiedPanel ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
+                </>
+              )}
+              {panelTab === 'summary' && (
+                summaryLoading
+                  ? <p className="text-sm text-gray-400 animate-pulse">Summarizing document...</p>
+                  : <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{summary}</p>
+              )}
             </div>
             {selectedSource.source_file.startsWith('https://docs.google.com/') && (
               <div className="px-6 py-5 border-t border-gray-200">
