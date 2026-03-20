@@ -17,10 +17,11 @@ interface Latency {
 }
 
 const EXAMPLE_QUERIES = [
-  'What was the build vs buy decision for the Unified Inbox?',
-  'What are the Q1 2026 initiatives and their owners?',
-  'What did we decide on AI Lead Scoring architecture?',
-  'What are the key risks on the product roadmap?',
+  'What was the outcome of the beta customer selection on February 3rd?',
+  'What were the top customer feature requests and which made it into Q1 scope?',
+  'What are the three architecture options for AI Lead Scoring and which one was selected?',
+  'What open questions remain unresolved across Q1 initiatives as of the latest documents?',
+  "What's the story with the inbox?",
 ]
 
 export default function Home() {
