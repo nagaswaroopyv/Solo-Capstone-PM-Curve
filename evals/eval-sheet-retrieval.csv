@@ -1,0 +1,58 @@
+JTBD,Query_Category,Question,Actual Answer,Precision_Score,Low_Precision_Flag,Recall,Faithfulness,Answer_Relevance,Hallucination,Hallucination_Detail,Missing_Info_In_Chunks,Failure_Mode,Root_Cause_Hypothesis,Pass_Fail,Notes
+JTBD-1,Exact Lookup,Who facilitated the Sprint 2 Retrospective?,"The Sprint 2 Retrospective was facilitated by Priya Sharma, VP Engineering",33%,Yes,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Exact Lookup,What was the outcome of the beta customer selection on February 3rd?,"The outcome of the beta customer selection on February 3rd was the selection of 20 accounts based on data volume, engagement, and willingness to provide feedback",67%,No,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Exact Lookup,Which model is used by the AI Reply Engine?,The AI Reply Engine uses a fine-tuned Claude 3.5 Sonnet model on a customer support corpus,33%,Yes,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Exact Lookup,What is the file name of the Workflow Automation PRD?,The file name of the Workflow Automation PRD is PRD_Workflow_Automation_Engine.md,67%,No,5,5,3,Y,added .md file extention from the chunk to the file name,NA,Generation," LLM extracted metadata instead of content — the chunk contains .md filenames mixed with actual content, and the model latched onto the wrong part.",Partial Pass,
+JTBD-1,Factual Extraction,What were the top customer feature requests and which made it into Q1 scope?,"The top customer feature requests were:
+
+1. Workflow automation (68% urgency increasing)
+2. Multi-currency support for APAC expansion
+3. AI email drafting for sales outreach
+4. Custom dashboards (72%)
+
+The request for custom dashboards is prioritized for Q1, as it has been the #1 feature request for 18 months and is essential for Enterprise customers [2], [3].",100%,NO,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Factual Extraction,Why did we prioritize Workflow Automation over Customer 360 in Q2 and was there any pushback?,"The decision to prioritize Workflow Automation over Customer 360 in Q2 was based on the rationale that Customer 360 requires data unification infrastructure, which is not ready until H2. Additionally, Workflow Automation has a clearer revenue case, with a projected income of $1.8 million, and it addresses the number one reason for customer churn, as evidenced by RetailMax's churn due to reliance on ""18 Zapier integrations"" [1]. 
+
+There is no mention of any pushback regarding this decision in the available documents.",100%,No,5,5,2,Y,13 words added to the answer which are not available in ground truth with a 24% hallucination score,Yes,Retrieval,"LLM filled the gap by fabricating content instead of saying ""I don't know""",Fail,
+JTBD-1,Factual Extraction,What are the three architecture options for AI Lead Scoring and which one was selected?,"The three architecture options for AI Lead Scoring presented were:
+
+1. **Option A: Pure real-time** — Score on every lead creation/update with full model inference per event. 
+   - Pro: Instant scores. Best UX.
+   - Con: $0.12/score at scale, leading to $60K/month compute at 500K leads/month.
+
+2. **Option B: Batch (hourly)** — Score all leads every hour.
+   - Pro: Cost-efficient at $0.02/score; simple architecture.
+   - Con: Hourly scoring means missing responses for 68% of enterprise customers who respond to hot leads within 1 hour.
+
+3. **Option C: Hybrid** — Lightweight model for instant scoring on creation, with a full model re-score every 4 hours.
+   - Pro: Balance of speed and cost at $0.03/score on average.
+   - Con: Complexity due to maintaining two models.
+
+The selected approach is the **hybrid architecture**, which allows for instant scoring on lead creation and a full model re-score every 4 hours. This decision was made on November 3, 2025, based on customer feedback indicating the need for timely responses to leads [1], [2].",67%,No,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Tabular Extraction,What is the total engineering effort in story points for the Dashboard Builder broken down by epic?,I could not find a confirmed answer in the available documents.,0%,Yes,0,5,0,N,NA,NA,Retrieval,Graceful failure,Pass,The effort was in weeks and not story points
+JTBD-1,Tabular Extraction,Across the build vs buy analysis for the Workflow Engine which option had the better cost-to-timeline ratio?,I could not find a confirmed answer in the available documents.,0%,Yes,0,5,0,N,NA,NA,Retrieval,Graceful failure,Pass,
+JTBD-1,Tabular Extraction,What is the projected compute cost for the hybrid AI Lead Scoring approach in Year 1?,"The projected compute cost for the hybrid AI Lead Scoring approach in Year 1 is $3,000 per month, based on the analysis for a scale of 200 customers and 100,000 leads per month [1].",100%,No,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Paraphrased,How did delivery problems in the last sprint affect what we committed to stakeholders?,"In the last sprint, the delivery problem was related to the Unified Inbox v2 — specifically, the integration of Facebook Messenger and Instagram with the Meta Graph API. This integration was hitting rate limiting issues which required a migration to a webhook approach. As a result, the team accepted a 2-week delay in the timeline, moving the target delivery date from February 28 to March 14. This decision was made to ensure the integration remained scalable and met the expectations of a ""unified"" messaging solution. Sarah Chen is responsible for communicating this delay to stakeholders [1][3].",100%,No,5,3,3,Y,"There's one hallucination in the answer: it attributes ownership of the Unified Inbox initiative to Sarah Chen when the document clearly states the owner is James Rodriguez. Sarah Chen is the Head of Product sending the update, not the owner of that specific initiative.",NA,NA,Minor hallucination,Partial Pass,
+JTBD-1,Paraphrased,How does the system make sure the AI doesn't fabricate information in its answers?,I could not find any documents with sufficient relevance to answer this question. Try rephrasing or check if the topic exists in your connected documents.,0%,Yes,0,0,0,N,NA,NA,Retrieval,NA,Pass,
+JTBD-1,Paraphrased,How are we handling the situation where a new customer doesn't have enough historical data for the scoring model?,"To address the situation where a new customer does not have sufficient historical data for the scoring model, the plan is to provide an industry-standard baseline model and require a minimum of 500 leads from the customer [1].",100%,No,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Cross-Document,Across all Q1 PRDs what NFR targets are defined and do any of them conflict?,I could not find any documents with sufficient relevance to answer this question. Try rephrasing or check if the topic exists in your connected documents.,0%,Yes,0,0,0,N,NA,NA,Retrieval,NA,Pass,
+JTBD-1,Cross-Document,What open questions remain unresolved across Q1 initiatives as of the latest documents?,"The open question that remains unresolved across Q1 initiatives as of the latest documents is related to the Unified Inbox v2 — Social Channels. A decision is needed on whether to accept a 2-week delay to implement the recommended webhook approach for Facebook Messenger and Instagram integration or to ship without these channels and add them later. This recommendation comes from James Rodriguez, who has indicated the importance of Facebook Messenger as the #2 requested social channel [1].",100%,No,5,5,5,N,NA,NA,NA,NA,Pass,
+JTBD-1,Negative,Why did Aisha Patel recommend a 2 week delay for the launch of the Facebook Messenger,"Aisha Patel recommended a 2-week delay for the launch of the Facebook Messenger integration because Facebook Messenger is the #2 requested social channel after WhatsApp, and shipping without it would undermine the ""unified"" promise of the product",100%,No,5,5,1,Y,"The recommendation was done by James and not Aisha, the system confidently hallucinates",NA,Generation,Hallucinating incorrect owner,Fail,
+JTBD-1,Negative,what are the social jobs to be done for Dashboard builder ?,"The social jobs to be done for the Dashboard Builder include:
+
+1. **Sharing Metrics**: Users want to share a dashboard with specific teammates to have a shared view of their metrics.
+2. **Creating Personal Dashboards**: Sales representatives want to create personal dashboards showing their deals, activities, and quota attainment to self-manage their performance.
+3. **Creating Dashboard Templates**: Admins want to create dashboard templates that new users can clone to expedite onboarding [2].",100%,No,5,5,2,Y,"Confidently hallucinating as there are only jobs to be done and there is no category such as Functional, social, psychological and emotional",Yes,Generation,,Fail,
+JTBD-1,Negative,what are the two dependencies of the custom dashboard builder,"The two dependencies of the custom dashboard builder are:
+
+1. Data API v2 — The dashboard builder requires the new unified data API, which is scheduled to ship in January 2026.
+2. Permissions framework update — The current role-based access does not support dashboard-level sharing, and an update is being delivered by the security team by February 15, 2026 [2].",100%,NO,5,3,5,N,NA,NA,Generation,"I aksed for 2, it only gave 2, it should've intelligently told there are three because in other example I asked for 4 and it gave 3 and said there isn't a fourth one explicitly",Partial Pass,
+JTBD-1,Vague,What decisions have been made recently?,,,,,,,,,,,,,
+JTBD-1,Vague,What are we doing about the competition?,I could not find any documents with sufficient relevance to answer this question. Try rephrasing or check if the topic exists in your connected documents.,,,,,,,,,,,,
+JTBD-1,Vague,What's the story with the inbox?,"The decision has been made to build an in-house integration layer for a unified inbox rather than partnering with external services like MessageBird or Twilio Flex. This decision was made on October 22, 2025, during the Quarterly Planning session, with the rationale that customer data is crucial for the company's competitive advantage, and routing it through third parties could create dependency and privacy risks. Additionally, the integration layer will provide deep CRM context essential for user interaction, which third-party tools may not be able to perform accessibly. 
+
+The user stories for the unified inbox (Epic: NEXUS-5102) include:
+
+1. **US-101**: A support agent wants to see all customer messages across channels in one chronological thread for complete conversation context. The acceptance criteria specify that the thread view will merge email, chat, social, SMS, and phone transcripts with relevant details such as channel icon and timestamp.
+   
+2. **US-102**: A support agent wants AI-suggested replies based on the conversation context and knowledge base to respond more quickly. The acceptance criteria include the generation of 2-3 suggested replies by the AI for the agent's consideration [1].",100%,No,5,2,3,y,,na,Generation,,Fail,

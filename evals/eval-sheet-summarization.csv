@@ -1,0 +1,11 @@
+TC_ID,JTBD,Query_Category,Document_To_Summarize,Prompt_Used,Actual_Summary,Coverage_Score,Coverage_Notes,Conciseness_Score,Conciseness_Notes,Accuracy_Score,Accuracy_Notes,Hallucination,Hallucination_Detail,Pass_Fail,Notes
+TC-S-001,JTBD-2,Summarization,AI Lead Scoring PRD,Summarize this document,,,,,,,,,,
+TC-S-002,JTBD-2,Summarization,Workflow Automation PRD,Summarize this document,,,,,,,,,,
+TC-S-003,JTBD-2,Summarization,Dashboard Builder PRD,Summarize this document,,,,,,,,,,
+TC-S-004,JTBD-2,Summarization,Unified Inbox PRD,Summarize this document,,,,,,,,,,
+TC-S-005,JTBD-2,Summarization,Sprint 2 Retrospective,Summarize this document,,,,,,,,,,
+TC-S-006,JTBD-2,Summarization,Q1 2026 Product Roadmap,Summarize this document,,,,,,,,,,
+TC-S-007,JTBD-2,Summarization,Decision Log 2025-2026,Summarize this document,,,,,,,,,,
+TC-S-008,JTBD-2,Summarization,AI Lead Scoring PRD,What are the key decisions and open risks in this document?,,,,,,,,,,
+TC-S-009,JTBD-2,Summarization,Workflow Automation PRD,What are the key decisions and open risks in this document?,,,,,,,,,,
+TC-S-010,JTBD-2,Summarization,Sprint 2 Retrospective,What went well what went wrong and what should we do differently?,,,,,,,,,,
