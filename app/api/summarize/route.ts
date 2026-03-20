@@ -1,40 +1,29 @@
-import { google } from 'googleapis'
+import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 import { NextRequest } from 'next/server'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
-oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN })
-
-const drive = google.drive({ version: 'v3', auth: oauth2Client })
-
-function extractFileId(url: string): string | null {
-  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
-  return match ? match[1] : null
-}
 
 export async function POST(request: NextRequest) {
   const { source_file, source_name } = await request.json()
 
-  const fileId = extractFileId(source_file)
-  if (!fileId) {
-    return new Response(JSON.stringify({ error: 'Invalid Drive URL' }), { status: 400 })
+  // Fetch all chunks for this document from Supabase
+  const { data: chunks, error } = await supabase
+    .from('documents')
+    .select('content')
+    .eq('source_file', source_file)
+    .order('id')
+
+  if (error || !chunks || chunks.length === 0) {
+    return new Response(JSON.stringify({ error: 'No content found for this document.' }), { status: 404 })
   }
 
-  // Fetch full document text from Drive
-  const res = await drive.files.export({ fileId, mimeType: 'text/plain' }, { responseType: 'text' })
-  const text = res.data as string
+  const fullText = chunks.map((c: any) => c.content).join('\n\n')
 
-  if (!text || text.trim().length === 0) {
-    return new Response(JSON.stringify({ error: 'Document is empty' }), { status: 400 })
-  }
-
-  // Summarize with GPT-4o-mini
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
@@ -48,7 +37,7 @@ export async function POST(request: NextRequest) {
       },
       {
         role: 'user',
-        content: `Document: ${source_name}\n\n${text.slice(0, 12000)}`,
+        content: `Document: ${source_name}\n\n${fullText.slice(0, 12000)}`,
       },
     ],
   })
