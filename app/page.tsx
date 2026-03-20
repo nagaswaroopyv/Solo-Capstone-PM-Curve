@@ -1,142 +1,54 @@
-'use client'
+import Link from 'next/link'
 
-import { useState } from 'react'
-
-interface Source {
-  source_file: string
-  source_name: string
-  content: string
-  score: number
-}
-
-interface Latency {
-  embedding_ms: number
-  search_ms: number
-  llm_ms: number
-  total_ms: number
-}
-
-const EXAMPLE_QUERIES = [
-  'What was the outcome of the beta customer selection on February 3rd?',
-  'What were the top customer feature requests and which made it into Q1 scope?',
-  'What are the three architecture options for AI Lead Scoring and which one was selected?',
-  'What open questions remain unresolved across Q1 initiatives as of the latest documents?',
-  "What's the story with the inbox?",
+const STATS = [
+  { value: '83.6%', label: 'Hit Rate' },
+  { value: '4.1/5', label: 'Faithfulness' },
+  { value: '67',    label: 'Knowledge Chunks' },
+  { value: '14',    label: 'Drive Documents' },
 ]
 
-export default function Home() {
-  const [query, setQuery] = useState('')
-  const [answer, setAnswer] = useState('')
-  const [sources, setSources] = useState<Source[]>([])
-  const [latency, setLatency] = useState<Latency | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [streaming, setStreaming] = useState(false)
-  const [error, setError] = useState('')
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
-  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [copiedChunk, setCopiedChunk] = useState<number | null>(null)
-  const [copiedPanel, setCopiedPanel] = useState(false)
-  const [selectedSource, setSelectedSource] = useState<Source | null>(null)
-  const [panelTab, setPanelTab] = useState<'chunk' | 'summary'>('chunk')
-  const [summary, setSummary] = useState<string | null>(null)
-  const [summaryLoading, setSummaryLoading] = useState(false)
+const FEATURES = [
+  {
+    icon: 'search',
+    title: 'Plain-English Search',
+    body: 'Ask questions the way you think them. Hybrid semantic + keyword search surfaces the most relevant passages from your documents.',
+  },
+  {
+    icon: 'folder_shared',
+    title: 'Google Drive Connected',
+    body: 'OAuth 2.0 integration with your Drive. Documents are indexed automatically — ask about any PRD, roadmap, or meeting note.',
+  },
+  {
+    icon: 'fact_check',
+    title: 'Cited, Grounded Answers',
+    body: 'Every answer shows exactly which document and passage it came from. No hallucination without evidence — system says "I don\'t know" when unsure.',
+  },
+  {
+    icon: 'summarize',
+    title: 'One-Click Summaries',
+    body: 'Open any source in the side panel and summarize the full document in seconds — without leaving the search interface.',
+  },
+  {
+    icon: 'sort',
+    title: 'Cohere Reranking',
+    body: 'Retrieval candidates are reranked by relevance before the answer is generated — reducing noise and improving precision.',
+  },
+  {
+    icon: 'bar_chart',
+    title: 'Three-Layer Evals',
+    body: 'Automated retrieval eval (F1=0.47), LLM-as-judge, and manual human eval across 19 test cases. Attribution hallucination rate: 28%.',
+  },
+]
 
-  async function handleSearch(searchQuery: string = query) {
-    if (!searchQuery.trim()) return
+const PIPELINE = [
+  { icon: 'conversion_path', label: 'Embed query' },
+  { icon: 'manage_search',   label: 'Hybrid search' },
+  { icon: 'sort',            label: 'Rerank (Cohere)' },
+  { icon: 'smart_toy',       label: 'Generate (GPT-4o-mini)' },
+  { icon: 'chat',            label: 'Cited answer', green: true },
+]
 
-    setLoading(true)
-    setStreaming(false)
-    setError('')
-    setAnswer('')
-    setSources([])
-    setLatency(null)
-    setFeedback(null)
-    setCopied(false)
-    setSelectedSource(null)
-
-    try {
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery }),
-      })
-
-      if (!response.ok) throw new Error('Search failed')
-
-      const contentType = response.headers.get('Content-Type') || ''
-
-      if (!contentType.includes('text/event-stream')) {
-        const data = await response.json()
-        setAnswer(data.answer)
-        setSources(data.sources || [])
-        setLatency(data.latency || null)
-        setRecentSearches(prev =>
-          [searchQuery, ...prev.filter(s => s !== searchQuery)].slice(0, 5)
-        )
-        return
-      }
-
-      setStreaming(true)
-      const reader = response.body!.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
-
-        for (const line of lines) {
-          if (!line.trim()) continue
-          try {
-            const msg = JSON.parse(line)
-            if (msg.type === 'sources') {
-              setSources(msg.sources)
-            } else if (msg.type === 'token') {
-              setAnswer(prev => prev + msg.token)
-            } else if (msg.type === 'done') {
-              if (msg.answer) setAnswer(msg.answer)
-              if (msg.latency) setLatency(msg.latency)
-            }
-          } catch {}
-        }
-      }
-
-      setRecentSearches(prev =>
-        [searchQuery, ...prev.filter(s => s !== searchQuery)].slice(0, 5)
-      )
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Something went wrong'
-      setError(message)
-    } finally {
-      setLoading(false)
-      setStreaming(false)
-    }
-  }
-
-  function handleCopy() {
-    navigator.clipboard.writeText(answer)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  function handleReset() {
-    setAnswer('')
-    setSources([])
-    setLatency(null)
-    setQuery('')
-    setFeedback(null)
-    setCopied(false)
-    setSelectedSource(null)
-    setSummary(null)
-  }
-
-  const hasResult = answer.length > 0
-
+export default function LandingPage() {
   return (
     <main className="min-h-screen bg-surface">
 
@@ -144,368 +56,214 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-border/40 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-manrope)' }}>P</span>
+            <span className="text-white font-bold text-sm font-headline">P</span>
           </div>
           <span className="font-headline font-bold text-lg text-text-primary tracking-tight">PM Compass</span>
           <span className="pill bg-brand-dim text-brand">v1 · Prototype</span>
         </div>
-        <a
-          href="https://github.com/nagaswaroopyv/Solo-Capstone-PM-Curve"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:flex text-sm font-medium text-text-secondary border border-border rounded-full px-4 py-1.5 hover:bg-surface-low transition-colors"
-        >
-          GitHub ↗
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href="https://github.com/nagaswaroopyv/Solo-Capstone-PM-Curve"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex text-sm font-medium text-text-secondary border border-border rounded-full px-4 py-1.5 hover:bg-surface-low transition-colors"
+          >
+            GitHub ↗
+          </a>
+          <Link
+            href="/search"
+            className="text-sm font-semibold bg-brand text-white rounded-full px-4 py-1.5 hover:brightness-110 transition-all"
+          >
+            Try Live ↗
+          </Link>
+        </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-6 py-10">
+      {/* ── Hero ── */}
+      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div className="inline-flex items-center gap-2 pill bg-brand-dim text-brand mb-6">
+          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>explore</span>
+          Built from scratch · Production-ready · Fully evaluated
+        </div>
+        <h1 className="font-headline font-bold text-5xl md:text-6xl text-text-primary tracking-tight mb-6 leading-tight">
+          AI knowledge assistant<br />
+          built for <span className="text-brand">Product Managers</span>
+        </h1>
+        <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed mb-10">
+          PM Compass connects to your Google Drive and lets you search all your documents by content — not filename.
+          Ask questions in plain English. Get cited, grounded answers in seconds.
+        </p>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <Link
+            href="/search"
+            className="flex items-center gap-2 bg-brand text-white font-semibold px-7 py-3.5 rounded-full hover:brightness-110 transition-all shadow-lg shadow-brand/20"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>open_in_new</span>
+            Try PM Compass
+          </Link>
+          <a
+            href="https://github.com/nagaswaroopyv/Solo-Capstone-PM-Curve"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 border border-border text-text-primary font-semibold px-7 py-3.5 rounded-full hover:bg-surface-low transition-colors"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>code</span>
+            View Source
+          </a>
+        </div>
 
-        {/* ── Hero (no results) ── */}
-        {!hasResult && !loading && (
-          <div className="mb-10 text-center fade-up">
-            <div className="inline-flex items-center gap-2 pill bg-brand-dim text-brand mb-5">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>explore</span>
-              Connected to Google Drive · 14 docs · 67 chunks
+        {/* Headline stats */}
+        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {STATS.map(s => (
+            <div key={s.label} className="bg-white rounded-2xl border border-border/50 p-5 text-center shadow-sm">
+              <p className="font-headline font-bold text-3xl text-brand">{s.value}</p>
+              <p className="text-xs text-text-muted font-medium mt-1 uppercase tracking-wide">{s.label}</p>
             </div>
-            <h2 className="font-headline font-bold text-4xl text-text-primary tracking-tight mb-4 leading-tight">
-              Search your product knowledge
-            </h2>
-            <p className="text-base text-text-secondary max-w-lg mx-auto leading-relaxed">
-              Ask anything about your PRDs, roadmaps, meeting notes, and decisions.
-              PM Compass retrieves the most relevant context and generates a cited answer.
+          ))}
+        </div>
+      </section>
+
+      {/* ── Live demo callout ── */}
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <div className="bg-white rounded-3xl border border-border/40 shadow-xl overflow-hidden">
+          {/* Mock search bar */}
+          <div className="px-6 py-5 border-b border-border/30 bg-surface">
+            <div className="flex items-center gap-3 bg-white border border-border/50 rounded-xl px-4 py-3 shadow-sm">
+              <span className="material-symbols-outlined text-text-muted">search</span>
+              <span className="flex-1 text-text-primary text-sm">What are the three architecture options for AI Lead Scoring and which one was selected?</span>
+              <Link href="/search" className="bg-brand text-white text-xs font-semibold px-4 py-1.5 rounded-lg hover:brightness-110 transition-all">
+                Search
+              </Link>
+            </div>
+          </div>
+          {/* Mock answer */}
+          <div className="px-6 py-5 border-b border-border/20">
+            <div className="flex items-center justify-between mb-3">
+              <span className="pill bg-brand-dim text-brand">Answer</span>
+              <span className="text-xs text-text-muted">Copy</span>
+            </div>
+            <p className="text-sm text-text-primary leading-relaxed">
+              Three architecture options were evaluated for AI Lead Scoring{' '}
+              <span className="bg-brand-dim text-brand font-medium rounded px-1 text-xs">[1][2]</span>:<br /><br />
+              <strong>Option A — Pure real-time:</strong> Score on every lead creation. Con: $0.12/score = $60K/month at scale.<br /><br />
+              <strong>Option B — Batch (hourly):</strong> Cost-efficient at $0.02/score. Con: misses 68% of enterprise customers who respond within 1 hour.<br /><br />
+              <strong>Option C — Hybrid (selected):</strong> Lightweight model for instant scoring, full re-score every 4 hours. $0.03/score average. Decision made November 3, 2025.{' '}
+              <span className="bg-brand-dim text-brand font-medium rounded px-1 text-xs">[1]</span>
             </p>
           </div>
-        )}
-
-        {/* ── Search bar ── */}
-        <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-3 bg-white border border-border/60 rounded-2xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-brand/30 focus-within:border-brand/50 transition-all">
-            <span className="material-symbols-outlined text-text-muted shrink-0">search</span>
-            <input
-              type="text"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder="e.g. What did we decide about the Unified Inbox?"
-              className="flex-1 text-sm text-text-primary placeholder-text-muted bg-transparent focus:outline-none"
-            />
-            {query && (
-              <button
-                onClick={() => setQuery('')}
-                className="text-text-muted hover:text-text-secondary transition-colors text-lg leading-none shrink-0"
-              >
-                ✕
-              </button>
-            )}
+          {/* Sources */}
+          <div className="px-6 py-4 flex items-center justify-between">
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Sources — 2 documents retrieved</p>
+            <Link href="/search" className="text-sm font-semibold text-brand hover:underline flex items-center gap-1">
+              Try it yourself
+              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_forward</span>
+            </Link>
           </div>
-          <button
-            onClick={() => handleSearch()}
-            disabled={loading || !query.trim()}
-            className="bg-brand text-white px-5 py-3 rounded-2xl text-sm font-semibold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm shadow-brand/20"
-          >
-            {loading ? 'Searching…' : 'Search'}
-          </button>
         </div>
+      </section>
 
-        {/* ── Example queries ── */}
-        {!hasResult && !loading && recentSearches.length === 0 && (
-          <div className="mt-5 fade-up">
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">Try these examples</p>
-            <div className="flex flex-wrap gap-2">
-              {EXAMPLE_QUERIES.map(q => (
-                <button
-                  key={q}
-                  onClick={() => { setQuery(q); handleSearch(q) }}
-                  className="text-sm bg-white border border-border/50 rounded-full px-4 py-2 text-text-secondary hover:border-brand/40 hover:text-brand transition-colors"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
+      {/* ── Features ── */}
+      <section className="bg-surface-low border-y border-border/30 py-16">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="pill bg-brand-dim text-brand mb-3 inline-block">Capabilities</span>
+            <h2 className="font-headline font-bold text-4xl text-text-primary tracking-tight">What PM Compass does</h2>
           </div>
-        )}
-
-        {/* ── Recent searches ── */}
-        {recentSearches.length > 0 && !hasResult && !loading && (
-          <div className="mt-5">
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">Recent searches</p>
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map(s => (
-                <button
-                  key={s}
-                  onClick={() => { setQuery(s); handleSearch(s) }}
-                  className="text-sm bg-white border border-border/50 rounded-full px-4 py-2 text-text-secondary hover:border-brand/40 hover:text-brand transition-colors"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {FEATURES.map(f => (
+              <div key={f.title} className="bg-white rounded-2xl border border-border/40 p-5 shadow-sm">
+                <div className="w-10 h-10 bg-brand-dim rounded-xl flex items-center justify-center mb-4">
+                  <span className="material-symbols-outlined text-brand" style={{ fontSize: 20 }}>{f.icon}</span>
+                </div>
+                <h3 className="font-headline font-bold text-sm text-text-primary mb-1">{f.title}</h3>
+                <p className="text-xs text-text-secondary leading-relaxed">{f.body}</p>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* ── Error ── */}
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {/* ── Loading skeleton ── */}
-        {loading && !hasResult && (
-          <div className="mt-8 bg-white border border-border/40 rounded-3xl p-6 shadow-sm animate-pulse">
-            <div className="h-3 bg-surface-high rounded w-16 mb-5"></div>
-            <div className="space-y-3">
-              <div className="h-3 bg-surface-mid rounded w-full"></div>
-              <div className="h-3 bg-surface-mid rounded w-5/6"></div>
-              <div className="h-3 bg-surface-mid rounded w-4/6"></div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Results ── */}
-        {hasResult && (
-          <div className="mt-8 space-y-4 fade-up">
-
-            {/* Answer */}
-            <div className="bg-white border border-border/40 rounded-3xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="pill bg-brand-dim text-brand">Answer</span>
-                {!streaming && (
-                  <button
-                    onClick={handleCopy}
-                    className="flex items-center gap-1.5 text-xs text-text-muted hover:text-text-secondary transition-colors"
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
-                      {copied ? 'check' : 'content_copy'}
-                    </span>
-                    {copied ? 'Copied' : 'Copy'}
-                  </button>
+      {/* ── Pipeline ── */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <div className="text-center mb-12">
+          <span className="pill bg-brand-dim text-brand mb-3 inline-block">How it works</span>
+          <h2 className="font-headline font-bold text-4xl text-text-primary tracking-tight">RAG pipeline, end to end</h2>
+          <p className="text-text-secondary mt-3 max-w-xl mx-auto">Every search runs through a 4-stage pipeline: embed → hybrid search → rerank → generate. Streaming response starts as soon as the first token is ready.</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-border/40 p-6 shadow-sm">
+          <div className="flex items-center flex-wrap gap-2 justify-between">
+            {PIPELINE.map((step, i) => (
+              <div key={step.label} className="flex items-center gap-2">
+                <div className={`flex flex-col items-center gap-2`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${step.green ? 'bg-green-50 border border-green-200' : 'bg-brand-dim'}`}>
+                    <span className={`material-symbols-outlined ${step.green ? 'text-green-600' : 'text-brand'}`} style={{ fontSize: 22 }}>{step.icon}</span>
+                  </div>
+                  <span className={`text-xs font-semibold text-center ${step.green ? 'text-green-700' : 'text-text-secondary'}`}>{step.label}</span>
+                </div>
+                {i < PIPELINE.length - 1 && (
+                  <span className="material-symbols-outlined text-border mb-4" style={{ fontSize: 20 }}>arrow_forward</span>
                 )}
               </div>
-              <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">
-                {answer}
-                {streaming && <span className="cursor-blink ml-0.5 text-brand">▌</span>}
-              </p>
-
-              {/* Feedback */}
-              {!streaming && (
-                <div className="mt-4 pt-4 border-t border-border/20 flex items-center gap-3">
-                  <p className="text-sm text-text-muted">Was this helpful?</p>
-                  <button
-                    onClick={() => setFeedback('up')}
-                    className={`text-sm px-2 py-1 rounded-lg transition-colors ${feedback === 'up' ? 'bg-green-50 text-green-600' : 'text-text-muted hover:text-green-600'}`}
-                  >
-                    👍
-                  </button>
-                  <button
-                    onClick={() => setFeedback('down')}
-                    className={`text-sm px-2 py-1 rounded-lg transition-colors ${feedback === 'down' ? 'bg-red-50 text-red-600' : 'text-text-muted hover:text-red-500'}`}
-                  >
-                    👎
-                  </button>
-                  {feedback && (
-                    <span className="text-sm text-text-muted">
-                      {feedback === 'up' ? 'Thanks!' : "Got it — we'll improve this."}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Sources */}
-            {sources.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">
-                  Sources — {sources.length} document{sources.length > 1 ? 's' : ''} retrieved
-                </p>
-                <div className="space-y-3">
-                  {sources.map((source, i) => (
-                    <div key={i} className="bg-white border border-border/40 rounded-2xl p-4 shadow-sm">
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <span className="text-sm font-semibold text-text-primary truncate">
-                            [{i + 1}] {source.source_name || source.source_file.replace(/\\/g, '/')}
-                          </span>
-                          {source.source_file.startsWith('https://docs.google.com/') && (
-                            <a
-                              href={source.source_file}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-brand hover:underline whitespace-nowrap shrink-0 flex items-center gap-1"
-                            >
-                              <span className="material-symbols-outlined" style={{ fontSize: 12 }}>open_in_new</span>
-                              Drive
-                            </a>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className={`pill text-[10px] ${
-                            source.score >= 0.5 ? 'bg-green-50 text-green-700' :
-                            source.score >= 0.35 ? 'bg-yellow-50 text-yellow-700' :
-                            'bg-surface-mid text-text-muted'
-                          }`}>
-                            {(source.score * 100).toFixed(0)}% match
-                          </span>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(source.content)
-                              setCopiedChunk(i)
-                              setTimeout(() => setCopiedChunk(null), 2000)
-                            }}
-                            className="text-xs text-text-muted hover:text-text-secondary border border-border/50 rounded-lg px-2 py-0.5 transition-colors"
-                          >
-                            {copiedChunk === i ? '✓' : 'Copy'}
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedSource(selectedSource?.content === source.content ? null : source)
-                              setPanelTab('chunk')
-                              setSummary(null)
-                            }}
-                            className="text-xs text-brand border border-brand/30 hover:bg-brand-dim rounded-lg px-2 py-0.5 transition-colors"
-                          >
-                            View details
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2">{source.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Latency */}
-            {latency && (
-              <div className="bg-white border border-border/30 rounded-2xl px-5 py-3 flex flex-wrap gap-4 text-xs text-text-muted">
-                <span className="font-semibold text-text-secondary">Pipeline latency</span>
-                <span>Embedding: {latency.embedding_ms}ms</span>
-                <span>Search: {latency.search_ms}ms</span>
-                <span>LLM: {latency.llm_ms}ms</span>
-                <span className="font-semibold text-text-primary">Total: {latency.total_ms}ms</span>
-              </div>
-            )}
-
-            {/* New search */}
-            {!streaming && (
-              <button
-                onClick={handleReset}
-                className="text-sm text-brand hover:underline flex items-center gap-1"
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_back</span>
-                New search
-              </button>
-            )}
+            ))}
           </div>
-        )}
-      </div>
-
-      {/* ── Side panel ── */}
-      {selectedSource && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setSelectedSource(null)} />
-          <div className="relative bg-white w-full max-w-md shadow-2xl flex flex-col h-full border-l border-border/40">
-
-            {/* Panel header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-border/30">
-              <div>
-                <p className="text-sm font-semibold text-text-primary">{selectedSource.source_name || 'Document'}</p>
-                <p className="text-xs text-text-muted mt-0.5">{(selectedSource.score * 100).toFixed(0)}% match</p>
-              </div>
-              <button
-                onClick={() => setSelectedSource(null)}
-                className="text-text-muted hover:text-text-secondary text-xl font-light leading-none transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex border-b border-border/30 px-6">
-              <button
-                onClick={() => setPanelTab('chunk')}
-                className={`text-sm font-medium py-3 mr-6 border-b-2 transition-colors ${
-                  panelTab === 'chunk' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-secondary'
-                }`}
-              >
-                Matching passage
-              </button>
-              <button
-                onClick={async () => {
-                  setPanelTab('summary')
-                  if (!summary) {
-                    setSummaryLoading(true)
-                    const res = await fetch('/api/summarize', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ source_file: selectedSource.source_file, source_name: selectedSource.source_name }),
-                    })
-                    const data = await res.json()
-                    setSummary(data.summary || 'Could not generate summary.')
-                    setSummaryLoading(false)
-                  }
-                }}
-                className={`text-sm font-medium py-3 border-b-2 transition-colors ${
-                  panelTab === 'summary' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-secondary'
-                }`}
-              >
-                Summarize doc
-              </button>
-            </div>
-
-            {/* Panel body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
-              {panelTab === 'chunk' && (
-                <>
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Matching passage</p>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(selectedSource.content)
-                        setCopiedPanel(true)
-                        setTimeout(() => setCopiedPanel(false), 2000)
-                      }}
-                      className="flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary border border-border/50 rounded-lg px-2 py-0.5 transition-colors"
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>
-                        {copiedPanel ? 'check' : 'content_copy'}
-                      </span>
-                      {copiedPanel ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-                  <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">{selectedSource.content}</p>
-                </>
-              )}
-              {panelTab === 'summary' && (
-                summaryLoading
-                  ? (
-                    <div className="flex items-center gap-2 text-sm text-text-muted">
-                      <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
-                      Summarizing document…
-                    </div>
-                  )
-                  : <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">{summary}</p>
-              )}
-            </div>
-
-            {/* Panel footer */}
-            {selectedSource.source_file.startsWith('https://docs.google.com/') && (
-              <div className="px-6 py-5 border-t border-border/30">
-                <a
-                  href={selectedSource.source_file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full bg-brand hover:brightness-110 text-white text-sm font-semibold py-3 rounded-xl transition-all"
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>open_in_new</span>
-                  Open in Google Drive
-                </a>
-              </div>
-            )}
+          <div className="mt-4 pt-4 border-t border-border/20 flex flex-wrap gap-6 text-xs text-text-muted">
+            <span>Relevance threshold: 0.30</span>
+            <span>Top-10 → reranked to top-3</span>
+            <span>Streaming response</span>
+            <span>Graceful "I don't know" on low confidence</span>
           </div>
         </div>
-      )}
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
+        <div className="bg-brand rounded-3xl p-12">
+          <h2 className="font-headline font-bold text-3xl text-white mb-4">Ask your first question</h2>
+          <p className="text-brand-light text-base mb-8 max-w-md mx-auto">
+            Connected to 14 real PM artifacts — PRDs, roadmaps, meeting notes, and decision logs.
+          </p>
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-2 bg-white text-brand font-semibold px-8 py-3.5 rounded-full hover:bg-brand-dim transition-all shadow-lg"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>search</span>
+            Open PM Compass
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-border/30 px-6 py-10">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 bg-brand rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs font-headline">P</span>
+              </div>
+              <span className="font-headline font-bold text-base text-text-primary">PM Compass</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {['Next.js · TypeScript · Tailwind', 'Supabase pgvector', 'text-embedding-3-small', 'GPT-4o-mini', 'Cohere rerank-v3.5', 'Google Drive API · OAuth 2.0', 'Vercel'].map(t => (
+                <span key={t} className="pill bg-surface-mid text-text-secondary">{t}</span>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-3 shrink-0">
+            <Link href="/search" className="flex items-center gap-2 bg-brand text-white font-semibold px-5 py-2.5 rounded-full hover:brightness-110 transition-all">
+              Try Live ↗
+            </Link>
+            <a
+              href="https://github.com/nagaswaroopyv/Solo-Capstone-PM-Curve"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 border border-border text-text-primary font-semibold px-5 py-2.5 rounded-full hover:bg-surface-low transition-colors"
+            >
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+      </footer>
+
     </main>
   )
 }
